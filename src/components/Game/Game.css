@@ -1,0 +1,14 @@
+
+.Game{
+  display: flex;
+  flex-direction: row;
+}
+.gameArea{
+  width: 50%;
+  height: 100%;
+}
+
+.infoArea{
+  width: 50%;
+  height: 100%;
+}

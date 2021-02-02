@@ -10,8 +10,7 @@ class ChatHistory extends React.Component{
     );
 
     return(
-      <div className = "ChatHistory">
-        <h2> Chat history </h2>
+      <div className = "ChatHistory" style = {{maxHeight: window.innerHeight*0.65}}>
         {messages}
       </div>
     )
