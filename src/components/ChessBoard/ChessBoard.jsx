@@ -5,6 +5,7 @@ class ChessBoard extends React.Component{
   constructor(props){
     super(props);
     this.state = {
+      interacteable: false,
       size: 0,
       margin_top: 0,
       board: [],
@@ -30,10 +31,10 @@ class ChessBoard extends React.Component{
       for(let i = 0; i < SIZE; i++){
         for(let j = 0; j < SIZE; j++){
           if((i + j)%2 === 0){
-            ctx.fillStyle = "white";
+            ctx.fillStyle = "#EAE3C9";
           }
           if((i+j)%2 === 1){
-            ctx.fillStyle = "rgba(0,210,0,0.5)";
+            ctx.fillStyle = "#A67A5B";
           }
           ctx.beginPath();
           ctx.fillRect(i*SIZE, j*SIZE, SIZE, SIZE);

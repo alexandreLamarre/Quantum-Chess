@@ -1,6 +1,7 @@
 import React from "react";
 import './App.css';
 import Game from "./components/Game/Game.jsx";
+import Main from "./components/Main";
 
 class App extends React.Component {
 
@@ -15,7 +16,7 @@ class App extends React.Component {
   render(){
     return  (
       <div className = "App">
-        <Game/>
+        <Main/>
       </div>
     );
   }

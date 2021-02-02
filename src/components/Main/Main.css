@@ -1,0 +1,14 @@
+.Main{
+  display: flex;
+  flex-direction: row;
+}
+
+.BoardArea{
+  width:50%;
+  height: 100%;
+}
+
+.OtherArea{
+  width: 50%;
+  height: 100%;
+}

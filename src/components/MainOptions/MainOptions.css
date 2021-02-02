@@ -1,0 +1,4 @@
+.MainOptions{
+  display: flex;
+  flex-direction: column;
+}

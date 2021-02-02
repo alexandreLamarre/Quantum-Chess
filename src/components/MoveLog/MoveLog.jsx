@@ -23,6 +23,7 @@ class MoveLog extends React.Component{
     return (
       <div className = "moveLog">
         <Header name = {"Moves log"}/>
+        {moves}
       </div>
     )
   }
