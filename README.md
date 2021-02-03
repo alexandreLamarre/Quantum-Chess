@@ -1,70 +1,76 @@
-# Getting Started with Create React App
+# Quantum Chess
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A web-app that implements a game of chess augmented with quantum rules dictated by underlying quantum circuits.
+The backend is written in Golang and its directory can be found [here](https://github.com/alexandreLamarre/Quantum-Chess-Backend)
 
-## Available Scripts
+For those unfamiliar with Quantum mechanics, a brief overview is given in [Quantum Mechanics Overview](#Quantum-Mechanics-Overview) Section
 
-In the project directory, you can run:
+## Table of contents
+- [Rules](#Rules)
+- [Quantum Mechanics Overview](#Quantum-Mechanics-Overview)
+- [References](#References)
 
-### `yarn start`
+### Rules
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+We wall call the game pieces in Quantum Chess Q-pieces for convenience.
+For those unfamiliar with Quantum mechanics, a brief overview is given in Quantum Mechanics.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+- Each Q-piece has a **state space**, **initial state** and **quantum gate(or action)** associated with it:
+  - Q-pawn: 
+      - State space: {Pawn, The piece starting behind it}
+      - Initial state: 
+        - 1.0 Pawn 
+        - 0.0 Piece behind it
+      - Quantum gate: **Pauli Z**, (qantum phase shift) 
+  - Q-queen:
+      - State space: {Queen, Pawn}
+      - Initial state: 
+         - 1/sqrt(2) Queen
+         - 1/Sqrt(2) Pawn
+      - Quantum gate: **Hadamard Gate**
+  - Q-king (regular chess king):
+      - State space: {King}
+      - Initial state: 
+        - 1.0 King
+      - Quantum gate: **None**
+  - Q-Rook:
+      - State space: {Rook, Pawn}
+      - Initial state: 
+        - 1/sqrt(2) Rook
+        - 1/sqrt(2) Pawn
+      - Quantum action: **Measurement**
+  - Q-Bishop:
+      - State space: {Bishop, Pawn}
+      - Initial state: 
+        - 1/sqrt(2) Bishop
+        - 1/sqrt(2) Pawn
+      - Quantum gate: **Pauli Y**
+  - Q-Knight:
+      - State space: {Knight, Pawn}
+      - Initial state:
+        - 1/sqrt(2) Knight
+        - 1/sqrt(2) Pawn
+      - Quantum gate: **Pauli Z**
+        
+- Q-pieces in a mixed state can move in terms of pieces in their state space
+  - Example: A Q-rook in a mixed state can move as a rook or pawn
 
-### `yarn test`
+- Q pieces in a determined state, i.e. one of the states = 1.0 and the other 0.0, can only move as the piece whose state they are in.
+  - Example: A Q-queen with state (0.0 Queen, 1.0 Pawn) can **ONLY** move as a **PAWN**.
+ 
+- A Q-piece's **area of influence** is determined when a Q-piece is moved. The area of influence is the path upon which the Q-piece could have been to reach its destination.As it is moving, pieces in the moved Q-piece's area of influence become entangled with the moved Q-piece, unless it is performing a capture. 
+  - Examples shown below
+  
+  TODO: ADD EXAMPLE PICTURES
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- A Q-piece's quantum gate is applied to the entangled state produced by its **area of influence**, unless it is performing a capture with its move.
+  
 
-### `yarn build`
+- A Q-piece's state is determined when it performs a capture or is captured itself. (Following the rules of quantum mechanics, entangled q-pieces that perform the capture or are captured are also measured). A Q-piece's state can also be measured by a Rook's **area of influence**.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- An entangled state of 8 or more pieces collapses on itself due to instability and becomes measured. (The real reason this rule is implemented is due to **hardware limitations**)
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- The game ends when a player has only one remaining king in a determined state that is checkmated.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `yarn eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `yarn build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### Refereces
+- Nielsen, Michael A., and Isaac Chuang. "Quantum computation and quantum information." (2002): 558-559.
