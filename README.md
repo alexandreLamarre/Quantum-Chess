@@ -18,15 +18,17 @@ For those unfamiliar with Quantum mechanics, a brief overview is given in Quantu
 #### Rules pertaining to the nature & movement of Q-pieces
 
 - **Rule 1.1** Each Q-piece has a **state space**, **initial state** and **quantum gate(or action)** associated with it:
-|Q-piece| State Space | Initial State | Quantum gate/action | Quantum gate/action description | Symbol |
-| :---: | :---------: | :-----------: | :-----------------: | :-----------------------------: |
-| Q-pawn |{Pawn, The piece starting behind it}| 1.0 Pawn 0.0 Other piece | **Pauli Z**| Quantum phase shift: | |
-| Q-queen | {Queen, Pawn} | 1/sqrt(2) Queen 1/sqrt(2) Pawn | **Hadamard gate** | | |
-| Q-king | {King} | 1.0 King | None, just a regular chess king | None | |
-| Q-rook | {Rook, Pawn} | 1/sqrt(2) Rook /sqrt(2) Pawn | **Measurement**| Performs the measurement action on a quantum system| |
-| Q-bishop | {Bishop, Pawn} | 1/sqrt(2) Bishop 1/sqrt(2) Pawn | **Pauli Y** | | |
-| Q- knight | {Kinght, pawn} | 1/sqrt(2) Kinght 1/sqrt(2) Pawn | **Pauli X** | controlled NOT gate, "swaps" the probability of quantum states| |
 
+
+
+|Q-piece| State Space | Initial State | Quantum gate/action | Gate/action description | Symbol |
+| :---: | :---------: | :-----------: | :-----------------: | :-----------------------------: | :---: |
+| Q-pawn |\{Pawn, The piece starting behind it\}| 1.0 Pawn 0.0 Other piece | **Pauli Z**| Quantum phase shift: | a |
+| Q-queen | \{Queen, Pawn\} | 1/sqrt(2) Queen 1/sqrt(2) Pawn | **Hadamard gate** | a | a|
+| Q-king | \{King\} | 1.0 King | None, just a regular chess king | None | a|
+| Q-rook | \{Rook, Pawn\} | 1/sqrt(2) Rook /sqrt(2) Pawn | **Measurement**| Performs the measurement action on a quantum system| a |
+| Q-bishop | \{Bishop, Pawn\} | 1/sqrt(2) Bishop 1/sqrt(2) Pawn | **Pauli Y** | a |  a|
+| Q- knight | \{Kinght, pawn} | 1/sqrt(2) Kinght 1/sqrt(2) Pawn | **Pauli X** | controlled NOT gate, "swaps" the probability of quantum states|a |
 
 
   
@@ -61,7 +63,9 @@ For those unfamiliar with Quantum mechanics, a brief overview is given in Quantu
 
 #### Rules pertaining to winning
 
-- **Rule 5.1** The game ends when a player has only one remaining king in a determined state that is checkmated. The player whose remaining king is checkmated loses and the other wins.
+- **Rule 5.1** The game ends when a player has only one remaining determined state king, that is checkmated. The player whose remaining king is checkmated loses while the other wins.
+
+- **Rule 5.2** The game ends when a player has only one remaining determined state king that is flipped back to a mixed state. The player whose remaining determined state king was flipped to a mixed state loses, while the other wins.
 
 ### Refereces
 - Nielsen, Michael A., and Isaac Chuang. "Quantum computation and quantum information." (2002): 558-559.
