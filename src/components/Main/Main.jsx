@@ -63,7 +63,8 @@ class Main extends React.Component{
           </IonRow>
           <IonRow>
             <IonCol>
-              <ChessBoard />
+            {/*ACTIVE = TRUE only for testing, otherwise undefined, or better yet, false. */}
+              <ChessBoard fullBoard = {true} active = {true}/>
             </IonCol>
             <IonCol>
               <MainOptions />

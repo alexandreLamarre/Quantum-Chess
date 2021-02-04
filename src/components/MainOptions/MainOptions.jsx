@@ -1,9 +1,6 @@
 import React from "react";
 import "./MainOptions.css";
 
-import OptionsHeader from "../OptionsHeader";
-import BigButton from "../BigButton";
-
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
 

@@ -1,6 +1,7 @@
 import React from "react";
 import "./ChessBoard.css";
-import {Qbishop, Qking, Qknight, Qpawn, Qqueen, Qrook} from "../../datatypes/Qpieces";
+import QuantumBoard from  "../../datatypes/QuantumBoard";
+
 
 const WHITE = 0;
 const BLACK = 1;
@@ -9,16 +10,44 @@ class ChessBoard extends React.Component{
   constructor(props){
     super(props);
     this.state = {
-      interacteable: false,
+      interacteable: this.props.active,
       size: 0,
       margin_top: 0,
       board: [],
     }
     this.canvas = React.createRef();
   }
+  componentDidMount(){
+    const board = new QuantumBoard(this.props.scenario, this.props.fullBoard);
+    console.log(board)
+    const w = Math.floor(window.innerWidth/2);
+    const h = Math.floor(window.innerHeight);
+    const size = Math.min(w,h)*0.90;
+    const margin_top = Math.min(w,h)*0.10/2;
+    const canvas = this.canvas.current;
+    canvas.width = size;
+    canvas.height = size;
+    this.drawBoard(board);
+    this.setState({size: size, board: board})
+    window.addEventListener("resize", () => this.onResize() )
+  }
+
+  onResize(){
+    const w = Math.floor(window.innerWidth/2);
+    const h = Math.floor(window.innerHeight);
+    const size = Math.min(w,h) * 0.90;
+    const margin_top = Math.min(w,h)*0.10/2;
+
+    const canvas = this.canvas.current;
+    if(!canvas) return;
+
+    canvas.width = size;
+    canvas.height = size;
+    this.drawBoard(this.state.board);
+    this.setState({size:size});
+  }
 
   drawBoard(board){
-    if(!board){
       //draw initialBoard
       const canvas = this.canvas.current;
       if(!canvas){
@@ -46,41 +75,23 @@ class ChessBoard extends React.Component{
           ctx.closePath();
         }
       }
-    }
-    else{
-      // pass for now
-      return;
-    }
-  }
-
-  componentDidMount(){
-    testQpieces();
-    const w = Math.floor(window.innerWidth/2);
-    const h = Math.floor(window.innerHeight);
-    const size = Math.min(w,h)*0.90;
-    const margin_top = Math.min(w,h)*0.10/2;
-
-    const canvas = this.canvas.current;
-    canvas.width = size;
-    canvas.height = size;
-    this.drawBoard();
-    this.setState({size: size, margin_top: margin_top})
-    window.addEventListener("resize", () => this.onResize() )
-  }
-
-  onResize(){
-    const w = Math.floor(window.innerWidth/2);
-    const h = Math.floor(window.innerHeight);
-    const size = Math.min(w,h) * 0.90;
-    const margin_top = Math.min(w,h)*0.10/2;
-
-    const canvas = this.canvas.current;
-    if(!canvas) return;
-
-    canvas.width = size;
-    canvas.height = size;
-    this.drawBoard();
-    this.setState({size:size, margin_top: margin_top});
+      const positions = board.board;
+      for(let i = 0; i < positions.length; i++){
+        if(positions[i]){
+          const id = positions[i];
+          const piece = board.pieces[positions[i]];
+          piece.model.onload = ctx.drawImage(piece.model, i%8 *SIZE, Math.floor(i/8) *SIZE, SIZE, SIZE);
+          if(!board.entanglements[id]){
+            ctx.beginPath();
+            ctx.arc(i%8*SIZE + SIZE/2, Math.floor(i/8) * SIZE + SIZE/2, (SIZE/2) *(9/10), 0 , 2*Math.PI, false);
+            ctx.arc(i%8*SIZE + SIZE/2, Math.floor(i/8) * SIZE + SIZE/2, (SIZE/2) *(9/10)-4, 0 , 2*Math.PI, true);
+            ctx.fillStyle = piece.color === WHITE? "rgb(255,255,255)": "rgb(0,0,0)"
+            ctx.fill();
+            ctx.closePath();
+          }
+          // piece.model.onload = ctx.drawImage(piece.model, i%8 *SIZE, i/8 *SIZE, SIZE, SIZE);
+        }
+      }
 
   }
 
@@ -97,18 +108,3 @@ class ChessBoard extends React.Component{
 }
 
 export default ChessBoard;
-
-function testQpieces(){
-  const qpawn = new Qpawn("Queen", BLACK)
-  console.log(qpawn);
-  const qknight = new Qknight(WHITE);
-  console.log(qknight);
-  const qqueen = new Qqueen(BLACK);
-  console.log(qqueen);
-  const qbishop=  new Qbishop(BLACK);
-  console.log(qbishop);
-  const qking = new Qking(WHITE);
-  console.log(qking)
-  const qrook = new Qrook(WHITE);
-  console.log(qrook);
-}

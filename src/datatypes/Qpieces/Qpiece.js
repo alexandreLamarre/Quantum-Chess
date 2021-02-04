@@ -8,11 +8,13 @@ class Qpiece{
   @param initialState array of floats of initial state values,
         !!! MUST match insertion order of state space !!!
   @param action string describing action of Qpiece
+  @param model image object for the qpiece
   **/
-  constructor(stateSpace, initialState, action, color){
+  constructor(stateSpace, initialState, action, color, model){
     this.color = color;
     this.stateSpace = stateSpace;
-    this.action = action
+    this.action = action;
+    this.model = model;
     if(!this.action) this.action = "None";
     if(!stateSpace) {
       this.stateSpace = {};
