@@ -1,5 +1,9 @@
 import React from "react";
 import "./ChessBoard.css";
+import {Qbishop, Qking, Qknight, Qpawn, Qqueen, Qrook} from "../../datatypes/Qpieces";
+
+const WHITE = 0;
+const BLACK = 1;
 
 class ChessBoard extends React.Component{
   constructor(props){
@@ -28,6 +32,7 @@ class ChessBoard extends React.Component{
         return;
       }
       const SIZE = canvas.width/8;
+      // draw board
       for(let i = 0; i < SIZE; i++){
         for(let j = 0; j < SIZE; j++){
           if((i + j)%2 === 0){
@@ -49,6 +54,7 @@ class ChessBoard extends React.Component{
   }
 
   componentDidMount(){
+    testQpieces();
     const w = Math.floor(window.innerWidth/2);
     const h = Math.floor(window.innerHeight);
     const size = Math.min(w,h)*0.90;
@@ -91,3 +97,18 @@ class ChessBoard extends React.Component{
 }
 
 export default ChessBoard;
+
+function testQpieces(){
+  const qpawn = new Qpawn("Queen", BLACK)
+  console.log(qpawn);
+  const qknight = new Qknight(WHITE);
+  console.log(qknight);
+  const qqueen = new Qqueen(BLACK);
+  console.log(qqueen);
+  const qbishop=  new Qbishop(BLACK);
+  console.log(qbishop);
+  const qking = new Qking(WHITE);
+  console.log(qking)
+  const qrook = new Qrook(WHITE);
+  console.log(qrook);
+}

@@ -3,9 +3,10 @@ import {v4 as uuidv4} from "uuid";
 import ChessBoard from "../ChessBoard";
 import MainOptions from "../MainOptions";
 
-import { alert, logoOctocat, copyOutline, logoElectron, checkboxOutline,
+
+import { logoElectron, checkboxOutline,
   closeCircleOutline } from 'ionicons/icons';
-import { IonButton, IonGrid, IonRow, IonCol, IonContent, IonChip, IonLabel, IonIcon,
+import { IonGrid, IonRow, IonCol, IonContent, IonLabel, IonIcon,
 IonCard, IonItem} from '@ionic/react';
 import '@ionic/react/css/core.css';
 /* Basic CSS for apps built with Ionic */
