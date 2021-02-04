@@ -15,62 +15,53 @@ For those unfamiliar with Quantum mechanics, a brief overview is given in [Quant
 We wall call the game pieces in Quantum Chess Q-pieces for convenience.
 For those unfamiliar with Quantum mechanics, a brief overview is given in Quantum Mechanics.
 
-- Each Q-piece has a **state space**, **initial state** and **quantum gate(or action)** associated with it:
-  - Q-pawn: 
-      - State space: {Pawn, The piece starting behind it}
-      - Initial state: 
-        - 1.0 Pawn 
-        - 0.0 Piece behind it
-      - Quantum gate: **Pauli Z**, (qantum phase shift) 
-  - Q-queen:
-      - State space: {Queen, Pawn}
-      - Initial state: 
-         - 1/sqrt(2) Queen
-         - 1/Sqrt(2) Pawn
-      - Quantum gate: **Hadamard Gate**
-  - Q-king (regular chess king):
-      - State space: {King}
-      - Initial state: 
-        - 1.0 King
-      - Quantum gate: **None**
-  - Q-Rook:
-      - State space: {Rook, Pawn}
-      - Initial state: 
-        - 1/sqrt(2) Rook
-        - 1/sqrt(2) Pawn
-      - Quantum action: **Measurement**
-  - Q-Bishop:
-      - State space: {Bishop, Pawn}
-      - Initial state: 
-        - 1/sqrt(2) Bishop
-        - 1/sqrt(2) Pawn
-      - Quantum gate: **Pauli Y**
-  - Q-Knight:
-      - State space: {Knight, Pawn}
-      - Initial state:
-        - 1/sqrt(2) Knight
-        - 1/sqrt(2) Pawn
-      - Quantum gate: **Pauli Z**
-        
-- Q-pieces in a mixed state can move in terms of pieces in their state space
+#### Rules pertaining to the nature & movement of Q-pieces
+
+- **Rule 1.1** Each Q-piece has a **state space**, **initial state** and **quantum gate(or action)** associated with it:
+|Q-piece| State Space | Initial State | Quantum gate/action | Quantum gate/action description | Symbol |
+| :---: | :---------: | :-----------: | :-----------------: | :-----------------------------: |
+| Q-pawn |{Pawn, The piece starting behind it}| 1.0 Pawn 0.0 Other piece | **Pauli Z**| Quantum phase shift: | |
+| Q-queen | {Queen, Pawn} | 1/sqrt(2) Queen 1/sqrt(2) Pawn | **Hadamard gate** | | |
+| Q-king | {King} | 1.0 King | None, just a regular chess king | None | |
+| Q-rook | {Rook, Pawn} | 1/sqrt(2) Rook /sqrt(2) Pawn | **Measurement**| Performs the measurement action on a quantum system| |
+| Q-bishop | {Bishop, Pawn} | 1/sqrt(2) Bishop 1/sqrt(2) Pawn | **Pauli Y** | | |
+| Q- knight | {Kinght, pawn} | 1/sqrt(2) Kinght 1/sqrt(2) Pawn | **Pauli X** | controlled NOT gate, "swaps" the probability of quantum states| |
+
+
+
+  
+- **Rule 1.2 ** Q-pieces in a mixed state can move in terms of either piece in their state space
   - Example: A Q-rook in a mixed state can move as a rook or pawn
 
-- Q pieces in a determined state, i.e. one of the states = 1.0 and the other 0.0, can only move as the piece whose state they are in.
+- **Rule 1.3** Q-pieces in a determined state, i.e. where one of the states = 1.0 and the other 0.0, can only move as the piece whose state they are in.
   - Example: A Q-queen with state (0.0 Queen, 1.0 Pawn) can **ONLY** move as a **PAWN**.
  
-- A Q-piece's **area of influence** is determined when a Q-piece is moved. The area of influence is the path upon which the Q-piece could have been to reach its destination.As it is moving, pieces in the moved Q-piece's area of influence become entangled with the moved Q-piece, unless it is performing a capture. 
-  - Examples shown below
-  
+ #### Rules pertaining to Quantum entanglement & action of Q-pieces
+ 
+ - **Rule 2.1** Once a piece has moved it exerts an **area of influence** if it is in a **mixed state**. The area of influence corresponds to the squares where the piece could move. Should any q-pieces be found in that area of influence they will become entagled with the moved piece. The moved piece then applies its quantum gate/ action.
+ 
   TODO: ADD EXAMPLE PICTURES
-
-- A Q-piece's quantum gate is applied to the entangled state produced by its **area of influence**, unless it is performing a capture with its move.
+ 
+- **Rule 2.2** The order of events every turn are move ---(if captures)----> capture --- (else if in a mixed state) ---> influence -> entanglement -> quantum circuit/action.
   
+- **Rule 2.3** The area of influence, entaglement and quantum circuit/action only apply on the turn the piece is moved.
+  - E.g. if a Q-piece moves within a Q-queen's diagonal on a subsequent turn, it does not become entagled with the Q-queen due to Q-queen's area of influence. It only becomes entangled with the Q-queen if Q-queen is within the moved piece's own area of influence.
+  
+- **Rule 2.4** A Q-queen cannot become entangled with an opponent's pieces, nor does it exert its quantum circuit/action upon them.
 
-- A Q-piece's state is determined when it performs a capture or is captured itself. (Following the rules of quantum mechanics, entangled q-pieces that perform the capture or are captured are also measured). A Q-piece's state can also be measured by a Rook's **area of influence**.
+#### Rules pertaining to quantum measurement of Q-pieces
 
-- An entangled state of 8 or more pieces collapses on itself due to instability and becomes measured. (The real reason this rule is implemented is due to **hardware limitations**)
+- **Rule 3.1** A Q-piece's state is determined when it performs a capture or is captured itself. (Following the rules of quantum mechanics, entangled Q-pieces with the Q-piece that perform the capture or the Q-piece that is captured are also measured). A Q-piece's state can also be measured within a Q-rook's **area of influence** on the turn it is moved.
 
-- The game ends when a player has only one remaining king in a determined state that is checkmated.
+- **Rule 3.2** An entangled state of 8 or more pieces collapses, as if due to instability, and becomes measured. (The real reason this rule is implemented is due to **hardware limitations**)
+
+#### Rules pertaining to castling
+
+- **Rule 4.1 **Castling is a legal move in quantum chess and the rules of area of influence, entaglement and quantum circuits apply to the Q-rook the king castles with.
+
+#### Rules pertaining to winning
+
+- **Rule 5.1** The game ends when a player has only one remaining king in a determined state that is checkmated. The player whose remaining king is checkmated loses and the other wins.
 
 ### Refereces
 - Nielsen, Michael A., and Isaac Chuang. "Quantum computation and quantum information." (2002): 558-559.
