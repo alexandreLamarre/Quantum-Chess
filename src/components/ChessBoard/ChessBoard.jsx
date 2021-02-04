@@ -82,7 +82,7 @@ class ChessBoard extends React.Component{
     return (
       <div className = "boardArea">
         <canvas ref = {this.canvas}
-        style = {{marginTop: this.state.margin_top, outline: "1px solid black"}}
+        style = {{ outline: "1px solid black"}}
         className = "chessBoard"
         />
       </div>
