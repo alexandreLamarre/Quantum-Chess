@@ -55,11 +55,14 @@ For those unfamiliar with Quantum mechanics, a brief overview is given in Quantu
 
 - **Rule 3.1** A Q-piece's state is determined when it performs a capture or is captured itself. (Following the rules of quantum mechanics, entangled Q-pieces with the Q-piece that perform the capture or the Q-piece that is captured are also measured). A Q-piece's state can also be measured within a Q-rook's **area of influence** on the turn it is moved.
 
-- **Rule 3.2** An entangled state of 8 or more pieces collapses, as if due to instability, and becomes measured. (The real reason this rule is implemented is due to **hardware limitations**)
+- **Rule 3.2** An entangled state of 8 or more pieces collapses, as if due to instability, and becomes measured. It collapses before any quantum circuit can be applied. (The real reason this rule is implemented is due to **hardware limitations**)
 
-#### Rules pertaining to castling
+#### Miscelanious Rules
 
-- **Rule 4.1 **Castling is a legal move in quantum chess and the rules of area of influence, entaglement and quantum circuits apply to the Q-rook the king castles with.
+- **Rule 4.1** Castling is a legal move in quantum chess and the rules of area of influence, entaglement and quantum circuits apply to the Q-rook the king castles with.
+
+- **Rule 4.2** Any piece that reaches the end of the board that has a non-zero state of "Pawn" becomes a Q-queen in its initial state. 
+Chronologically, this event happens after a capture if it occured, so the piece only becomes a Q-queen if it is measured as a pawn. If the piece is in an entangled state when it arrives at the end of the board, the entangled state collapses and all pieces within it are measured, except the piece that was moved if it had a possibility of being a pawn -- instead it becomes a Q-queen. 
 
 #### Rules pertaining to winning
 
