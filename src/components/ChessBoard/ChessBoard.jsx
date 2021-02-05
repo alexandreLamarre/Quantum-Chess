@@ -115,7 +115,7 @@ class ChessBoard extends React.Component{
 
   showToolTip(e){
     const square = this.getSquare(e)
-    const id = this.state.board.board[square];
+    const id = this.state.board.getID(square);
     if(id !== null && this.state.hoverPiece === false){
       const piece = this.state.board.pieces[id].parseTooltip();
       const [x,y] = this.getLocation(e);
@@ -130,7 +130,7 @@ class ChessBoard extends React.Component{
     return (
       <div className = "boardArea">
         <canvas ref = {this.canvas}
-        onClick = {(e) => this.getLocation(e)}
+        onClick = {(e) => console.log(this.getSquare(e))}
         onMouseMove = {(e) => this.showToolTip(e)}
         style = {{ outline: "1px solid black"}}
         className = "chessBoard"

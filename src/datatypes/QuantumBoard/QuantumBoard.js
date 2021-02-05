@@ -19,6 +19,9 @@ class QuantumBoard {
       this.board = res[0];
       this.pieces = res[1];
       this.entanglements = res[2];
+      console.log(this.pieces[17].getLegalMoves(17,this.board.indexOf(17), this))
+      console.log(this.pieces[19].getLegalMoves(19,this.board.indexOf(19), this))
+      console.log(this.pieces[23].getLegalMoves(23,this.board.indexOf(23), this))
     }
 
     else if(scenario){
@@ -26,16 +29,22 @@ class QuantumBoard {
     }
   }
 
-  getBoard(){
-    return this.board;
+  /**
+  Called only when sure there is a piece at position
+  Returns color of piece
+  **/
+  getColor(position){
+    const id = this.getID(position);
+    if(id === null) console.log("FATAL ERROR GET COLOR")
+    return this.pieces[id].color;
   }
 
-  getPieces(){
-    return this.pieces;
-  }
-
-  getEntanglements(){
-    return this.entanglements;
+  /**
+  returns piece id at position
+  **/
+  getID(position){
+    if(this.board[position] === undefined) console.log("FATAL ERROR POSITION")
+    return this.board[position]
   }
 }
 
@@ -50,9 +59,9 @@ Returns [
 
 **/
 function defaultQuantumBoard(){
-
+  //map an id to pieces
   const pieces = {
-      17: new Qpawn("Rook", WHITE),
+      17: new Qpawn("Rook",WHITE),
       18: new Qpawn("Knight", WHITE),
       19: new Qpawn("Bishop", WHITE),
       20: new Qpawn("Queen", WHITE ),
@@ -70,6 +79,7 @@ function defaultQuantumBoard(){
       32: new Qrook(WHITE),
     }
 
+  // map ids to entanglements
   const entanglements = {
     17: null,
     18: null,
@@ -89,6 +99,7 @@ function defaultQuantumBoard(){
     32: null,
   }
 
+  //map board squares to piece ids
   const board = [
                 null, null, null, null, null, null, null, null,
                 null, null, null, null, null, null, null, null,
