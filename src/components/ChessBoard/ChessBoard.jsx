@@ -12,8 +12,11 @@ class ChessBoard extends React.Component{
     this.state = {
       interacteable: this.props.active,
       size: 0,
-      margin_top: 0,
       board: [],
+      toolTipx: 0,
+      toolTipy: 0,
+      hoverPiece: false,
+      tooltip: "",
     }
     this.canvas = React.createRef();
   }
@@ -23,7 +26,6 @@ class ChessBoard extends React.Component{
     const w = Math.floor(window.innerWidth/2);
     const h = Math.floor(window.innerHeight);
     const size = Math.min(w,h)*0.90;
-    const margin_top = Math.min(w,h)*0.10/2;
     const canvas = this.canvas.current;
     canvas.width = size;
     canvas.height = size;
@@ -36,7 +38,6 @@ class ChessBoard extends React.Component{
     const w = Math.floor(window.innerWidth/2);
     const h = Math.floor(window.innerHeight);
     const size = Math.min(w,h) * 0.90;
-    const margin_top = Math.min(w,h)*0.10/2;
 
     const canvas = this.canvas.current;
     if(!canvas) return;
@@ -95,13 +96,50 @@ class ChessBoard extends React.Component{
 
   }
 
+  getLocation(e){
+    const canvas = this.canvas.current;
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    return [x,y]
+  }
+
+  getSquare(e){
+    const canvas = this.canvas.current;
+    const SIZE = canvas.width/8;
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    return Math.floor(x/SIZE)+ 8*Math.floor(y/SIZE)
+  }
+
+  showToolTip(e){
+    const square = this.getSquare(e)
+    const id = this.state.board.board[square];
+    if(id !== null && this.state.hoverPiece === false){
+      const piece = this.state.board.pieces[id].parseTooltip();
+      const [x,y] = this.getLocation(e);
+      this.setState({hoverPiece:true, toolTipx: x, toolTipy: y, tooltip: piece});
+    }
+    else{
+      this.setState({hoverPiece:false})
+    }
+  }
+
   render(){
     return (
       <div className = "boardArea">
         <canvas ref = {this.canvas}
+        onClick = {(e) => this.getLocation(e)}
+        onMouseMove = {(e) => this.showToolTip(e)}
         style = {{ outline: "1px solid black"}}
         className = "chessBoard"
         />
+        <div className = "tooltip" hidden = {!this.state.hoverPiece}
+        style = {{top: this.state.toolTipy, left: this.state.toolTipx}}
+        >
+          {this.state.tooltip}
+        </div>
       </div>
     )
   }
