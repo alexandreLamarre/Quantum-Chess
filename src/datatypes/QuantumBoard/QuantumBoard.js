@@ -46,6 +46,13 @@ class QuantumBoard {
     if(this.board[position] === undefined) console.log("FATAL ERROR POSITION")
     return this.board[position]
   }
+
+  /**
+  Returns Quantum piece object with id id
+  **/
+  getPiece(id){
+    return this.pieces[id];
+  }
 }
 
 export default QuantumBoard;

@@ -8,8 +8,9 @@ const BLACK = 1;
 class Qqueen extends Qpiece{
   constructor(color){
     const s = new Set(["Queen", "Pawn"]);
-    const model = new Image();
-    if(color === WHITE) model.src = QWQUEEN;
+    // const model = new Image();
+    // if(color === WHITE) model.src = QWQUEEN;
+      const model = "\u{265B}";
     super(s, Normal_state, "Hadamard", color, model);
   }
 }

@@ -1,7 +1,7 @@
 import React from "react";
 import "./ChessBoard.css";
 import QuantumBoard from  "../../datatypes/QuantumBoard";
-
+var FLIPPED = false;
 
 const WHITE = 0;
 const BLACK = 1;
@@ -13,10 +13,14 @@ class ChessBoard extends React.Component{
       interacteable: this.props.active,
       size: 0,
       board: [],
+      highlighted: [],
       toolTipx: 0,
       toolTipy: 0,
       hoverPiece: false,
+      selectedPiece: null,
       tooltip: "",
+      player: WHITE,
+      dragging:false,
     }
     this.canvas = React.createRef();
   }
@@ -32,6 +36,12 @@ class ChessBoard extends React.Component{
     this.drawBoard(board);
     this.setState({size: size, board: board})
     window.addEventListener("resize", () => this.onResize() )
+    window.requestAnimationFrame(() => this.animate());
+  }
+
+  animate(){
+    this.drawBoard(this.state.board);
+    requestAnimationFrame(() => this.animate())
   }
 
   onResize(){
@@ -41,18 +51,18 @@ class ChessBoard extends React.Component{
 
     const canvas = this.canvas.current;
     if(!canvas) return;
-
-    canvas.width = size;
-    canvas.height = size;
-    this.drawBoard(this.state.board);
-    this.setState({size:size});
+    if(size > 200){
+      canvas.width = size;
+      canvas.height = size;
+      this.setState({size:size});
+    }
   }
 
   drawBoard(board){
       //draw initialBoard
       const canvas = this.canvas.current;
       if(!canvas){
-        console.log("canvas is undefined, Unexpected");
+        //canvas is probably re-rendering
         return;
       }
 
@@ -76,27 +86,63 @@ class ChessBoard extends React.Component{
           ctx.closePath();
         }
       }
-      const positions = board.board;
-      for(let i = 0; i < positions.length; i++){
-        if(positions[i]){
-          const id = positions[i];
-          const piece = board.pieces[positions[i]];
-          piece.model.onload = ctx.drawImage(piece.model, i%8 *SIZE, Math.floor(i/8) *SIZE, SIZE, SIZE);
-          if(!board.entanglements[id]){
-            ctx.beginPath();
-            ctx.arc(i%8*SIZE + SIZE/2, Math.floor(i/8) * SIZE + SIZE/2, (SIZE/2) *(9/10), 0 , 2*Math.PI, false);
-            ctx.arc(i%8*SIZE + SIZE/2, Math.floor(i/8) * SIZE + SIZE/2, (SIZE/2) *(9/10)-4, 0 , 2*Math.PI, true);
-            ctx.fillStyle = piece.color === WHITE? "rgb(255,255,255)": "rgb(0,0,0)"
-            ctx.fill();
-            ctx.closePath();
-          }
-          // piece.model.onload = ctx.drawImage(piece.model, i%8 *SIZE, i/8 *SIZE, SIZE, SIZE);
-        }
-      }
-
+      this.drawPieces(ctx, board, SIZE);
+      this.drawHighlighted(ctx, SIZE);
   }
 
-  getLocation(e){
+  drawHighlighted(ctx, size){
+    const highlighted = this.state.highlighted;
+    if(highlighted.length > 0)console.log(highlighted);
+    for(let i = 0; i < highlighted.length; i++){
+      ctx.beginPath();
+      ctx.fillStyle = "rgba(0,255,0,0.5)";
+      const x = highlighted[i]%8;
+      const y = Math.floor(highlighted[i]/8)
+      ctx.fillRect(x*size, y*size, size, size);
+      ctx.fill();
+      ctx.closePath();
+    }
+  }
+
+  drawPieces(ctx, board, size){
+
+    const positions = board.board;
+    const moving_id = this.state.selectedPiece;
+    for(let i = 0; i < positions.length; i++){
+      if(positions[i]){
+        const id = positions[i];
+        const piece = board.pieces[positions[i]];
+        if(id === moving_id){ this.drawPieceText(ctx, piece, size, this.state.selectedX-size/2, this.state.selectedY+size/2)}
+        else{this.drawPieceText(ctx, piece,size, i%8 * size, (Math.floor(i/8)+1) * size )}
+
+        if(!board.entanglements[id]){
+          //DRAW ENTAGLEMENTS
+        }
+        else{
+          //DRAW ENTANGLEMENTS
+        }
+      }
+    }
+  }
+
+  drawPieceText(ctx, piece, size, x, y){
+    const unicode = piece.model;
+    const color = piece.color === WHITE? "rgb(255,255,255)": "rgb(0,0,0)";
+    ctx.beginPath();
+    ctx.fillStyle = color;
+    ctx.font = (size*9/10).toString() + "px serif";
+    ctx.fillText(unicode, x, y-size/10);
+    ctx.fill();
+    ctx.closePath();
+    ctx.beginPath();
+    ctx.strokeStyle = "rgb(0,0,0)";
+    ctx.font = (size*9/10).toString() + "px serif";
+    ctx.strokeText(unicode, x, y-size/10);
+    ctx.stroke();
+    ctx.closePath();
+  }
+
+  getMouseLocation(e){
     const canvas = this.canvas.current;
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -118,7 +164,7 @@ class ChessBoard extends React.Component{
     const id = this.state.board.getID(square);
     if(id !== null && this.state.hoverPiece === false){
       const piece = this.state.board.pieces[id].parseTooltip();
-      const [x,y] = this.getLocation(e);
+      const [x,y] = this.getMouseLocation(e);
       this.setState({hoverPiece:true, toolTipx: x, toolTipy: y, tooltip: piece});
     }
     else{
@@ -126,12 +172,48 @@ class ChessBoard extends React.Component{
     }
   }
 
+  setDrag(e,v){
+    if(v){
+      const square = this.getSquare(e)
+      const id = this.state.board.getID(square);
+      const [x,y] = this.getMouseLocation(e)
+      console.log("id of piece selected", id);
+      var highlighted;
+      if(id){
+        const legal_moves = this.state.board.getPiece(id).getLegalMoves(id, square, this.state.board);
+        highlighted = legal_moves;
+        console.log("legalmoves", legal_moves)
+      }
+      else{
+        highlighted = [];
+      }
+      this.setState({dragging:true, selectedPiece: id, selectedX: x, selectedY:y,
+        highlighted: highlighted});
+    }
+    else{
+      console.log(this.getSquare(e));
+      this.setState({dragging: false, selectedPiece: null, highlighted: []})
+    }
+
+  }
+
+  handleMouseEventsOnCanvas(e){
+    if(this.state.dragging === true && this.state.selectedPiece !== null){
+      const [x,y] = this.getMouseLocation(e);
+      this.setState({selectedX: x, selectedY: y})
+    }
+  }
+
   render(){
+    const moving = this.state.selectedPiece;
     return (
       <div className = "boardArea">
         <canvas ref = {this.canvas}
-        onClick = {(e) => console.log(this.getSquare(e))}
-        onMouseMove = {(e) => this.showToolTip(e)}
+        style = {{cursor: this.state.selectedPiece=== null? "grab": "default"}}
+        onMouseLeave = {(e) => this.setDrag(e, false)}
+        onMouseDown = {(e) => this.setDrag(e,true)}
+        onMouseMove = {(e) => this.handleMouseEventsOnCanvas(e)}
+        onMouseUp = {(e) => {this.setDrag(e,false)}}
         style = {{ outline: "1px solid black"}}
         className = "chessBoard"
         />
