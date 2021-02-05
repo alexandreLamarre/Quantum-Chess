@@ -104,7 +104,6 @@ function kingMoves(position, color, board, legal_moves){
 }
 
 function pawnMoves(position, color, moved, board, legal_moves){
-  console.log("pawn legal moves called")
   if(color === WHITE){
     checkCapture(position, -1, color, board, legal_moves);
     const dy = moved === false? -2: -1;
@@ -144,7 +143,6 @@ function bishopMoves(position, color, board, legal_moves){
 function checkCapture(position, dy, color, board, legal_moves){
   if(!inBoard(position)) return;
   const capture_row = getRow(position) + dy;
-  console.log("capture row", capture_row)
   if(!inBoardRow(capture_row)) return;
 
   const l = capture_row * 8 + (position%8)- 1;

@@ -29,8 +29,10 @@ class ChessBoard extends React.Component{
     console.log(board)
     const w = Math.floor(window.innerWidth/2);
     const h = Math.floor(window.innerHeight);
-    const size = Math.min(w,h)*0.90;
+    var size = Math.min(w,h)*0.90;
     const canvas = this.canvas.current;
+    size = Math.max(200, size);
+    size = Math.min(596, size);
     canvas.width = size;
     canvas.height = size;
     this.drawBoard(board);
@@ -47,15 +49,14 @@ class ChessBoard extends React.Component{
   onResize(){
     const w = Math.floor(window.innerWidth/2);
     const h = Math.floor(window.innerHeight);
-    const size = Math.min(w,h) * 0.90;
+    var size = Math.min(w,h) * 0.90;
 
     const canvas = this.canvas.current;
     if(!canvas) return;
-    if(size > 200){
-      canvas.width = size;
-      canvas.height = size;
-      this.setState({size:size});
-    }
+    size = Math.max(200, size);
+    size = Math.min(596, size);
+    this.setState({size:size});
+
   }
 
   drawBoard(board){
@@ -65,7 +66,6 @@ class ChessBoard extends React.Component{
         //canvas is probably re-rendering
         return;
       }
-
       const ctx = canvas.getContext("2d");
       if(!ctx){
         console.log("canvas context is undefined, Unexpected");
@@ -156,7 +156,7 @@ class ChessBoard extends React.Component{
     const rect = canvas.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    return Math.floor(x/SIZE)+ 8*Math.floor(y/SIZE)
+    return Math.floor(x/SIZE)+ 8*Math.floor(y/SIZE);
   }
 
   showToolTip(e){
@@ -208,7 +208,7 @@ class ChessBoard extends React.Component{
     const moving = this.state.selectedPiece;
     return (
       <div className = "boardArea">
-        <canvas ref = {this.canvas}
+        <canvas ref = {this.canvas} id = "chessBoard"
         style = {{cursor: this.state.selectedPiece=== null? "grab": "default"}}
         onMouseLeave = {(e) => this.setDrag(e, false)}
         onMouseDown = {(e) => this.setDrag(e,true)}
