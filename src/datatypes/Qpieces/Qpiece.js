@@ -104,6 +104,7 @@ function kingMoves(position, color, board, legal_moves){
 }
 
 function pawnMoves(position, color, moved, board, legal_moves){
+  console.log("pawn legal moves called")
   if(color === WHITE){
     checkCapture(position, -1, color, board, legal_moves);
     const dy = moved === false? -2: -1;
@@ -143,10 +144,11 @@ function bishopMoves(position, color, board, legal_moves){
 function checkCapture(position, dy, color, board, legal_moves){
   if(!inBoard(position)) return;
   const capture_row = getRow(position) + dy;
+  console.log("capture row", capture_row)
   if(!inBoardRow(capture_row)) return;
 
-  const l = capture_row * 8 - 1;
-  const r = capture_row * 8 + 1;
+  const l = capture_row * 8 + (position%8)- 1;
+  const r = capture_row * 8 + (position%8)+ 1;
   if(capture_row === getRow(l) && inBoard(l)){
     if(board.getID(l) !== null && board.getColor(l) !== color){
       legal_moves.push(l);
@@ -235,10 +237,14 @@ function checkRightKnight(position, color, board, legal_moves){
   const u = u_row*8 +position%8 +2;
   const l = l_row*8 + position%8 +2;
   if(inBoardRow(u_row) && getRow(u) === u_row && inBoard(u)){
-    legal_moves.push(u);
+    if(board.getID(u) === null || board.getColor(u) !== color){
+      legal_moves.push(u);
+    }
   }
   if(inBoardRow(l_row) && getRow(l) === l_row && inBoard(l)){
-    legal_moves.push(l);
+    if(board.getID(l) === null || board.getColor(l) !== color){
+      legal_moves.push(l);
+    }
   }
 }
 

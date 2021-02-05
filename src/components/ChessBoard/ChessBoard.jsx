@@ -86,13 +86,13 @@ class ChessBoard extends React.Component{
           ctx.closePath();
         }
       }
+      if(this.props.highlight) this.drawHighlighted(ctx, SIZE);
       this.drawPieces(ctx, board, SIZE);
-      this.drawHighlighted(ctx, SIZE);
+
   }
 
   drawHighlighted(ctx, size){
     const highlighted = this.state.highlighted;
-    if(highlighted.length > 0)console.log(highlighted);
     for(let i = 0; i < highlighted.length; i++){
       ctx.beginPath();
       ctx.fillStyle = "rgba(0,255,0,0.5)";

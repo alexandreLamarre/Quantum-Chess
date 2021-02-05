@@ -19,9 +19,10 @@ class QuantumBoard {
       this.board = res[0];
       this.pieces = res[1];
       this.entanglements = res[2];
-      console.log(this.pieces[17].getLegalMoves(17,this.board.indexOf(17), this))
-      console.log(this.pieces[19].getLegalMoves(19,this.board.indexOf(19), this))
-      console.log(this.pieces[23].getLegalMoves(23,this.board.indexOf(23), this))
+      console.log(this.pieces[69])
+      this.pieces[70].moved =true;
+      this.pieces[71].moved =true;
+      this.pieces[69].moved =true;
     }
 
     else if(scenario){
@@ -68,6 +69,9 @@ Returns [
 function defaultQuantumBoard(){
   //map an id to pieces
   const pieces = {
+      69: new Qrook(WHITE),
+      70: new Qbishop(BLACK),
+      71: new Qbishop(WHITE),
       17: new Qpawn("Rook",WHITE),
       18: new Qpawn("Knight", WHITE),
       19: new Qpawn("Bishop", WHITE),
@@ -108,9 +112,9 @@ function defaultQuantumBoard(){
 
   //map board squares to piece ids
   const board = [
-                null, null, null, null, null, null, null, null,
-                null, null, null, null, null, null, null, null,
-                null, null, null, null, null, null, null, null,
+                null, null, null, 70, null, null, null, null,
+                null, null, null, null, 69, null, null, null,
+                null, null, null, null, null, 71, null, null,
                 null, null, null, null, null, null, null, null,
                 null, null, null, null, null, null, null, null,
                 null, null, null, null, null, null, null, null,
