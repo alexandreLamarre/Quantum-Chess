@@ -1,8 +1,6 @@
 import React from "react";
-import "./MainOptions.css";
+import "./Online.css";
 import {Link} from "react-router-dom";
-
-
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
 
@@ -18,12 +16,11 @@ import '@ionic/react/css/text-alignment.css';
 import '@ionic/react/css/text-transformation.css';
 import '@ionic/react/css/flex-utils.css';
 import '@ionic/react/css/display.css';
-import {schoolOutline, globeOutline, desktopOutline, logoOctocat, alertOutline, copyOutline} from "ionicons/icons";
+import {arrowBackOutline, schoolOutline, globeOutline, desktopOutline, logoOctocat, alertOutline, copyOutline} from "ionicons/icons";
 import {IonContent, IonTitle, IonButton, IonCard, IonCardHeader, IonCardSubtitle,
   IonCardTitle, IonCardContent, IonIcon, IonItem, IonChip, IonLabel} from '@ionic/react';
 
-
-class MainOptions extends React.Component{
+class Online extends React.Component{
   constructor(props){
     super(props);
     this.state = {
@@ -31,73 +28,106 @@ class MainOptions extends React.Component{
     }
   }
 
+  componentDidMount(){
+    // fetch the game rooms currently 
+  }
+
   render(){
 
     return(
       <IonContent style = {{cursor: "default"}}>
-        <IonTitle>
-          Learn & Play Quantum Chess
-        </IonTitle>
-        <Link to = {"/online"} style = {{textDecoration: 'none'}}>
+        <IonItem >
+
+          <Link to = {"/"} style = {{textDecoration: "none", color: "black"}}>
+            <IonIcon icon = {arrowBackOutline}>
+            </IonIcon>
+          </Link>
+
+          <IonTitle >
+            Matchmaking
+          </IonTitle>
+
+          <Link to = {"/online/gamerooms"} style = {{textDecoration: "none",
+          position: "absolute", right: "0"}}>
+          <IonTitle>
+            GameRooms
+          </IonTitle>
+          </Link>
+        </IonItem>
         <IonCard style = {{cursor: "pointer"}}>
             <IonItem>
               <IonIcon slot = "start" icon = {globeOutline}/>
               <IonCardHeader>
 
-                <IonCardTitle>Play Online</IonCardTitle>
-                <IonCardSubtitle> Play in ranked, unranked or custom games </IonCardSubtitle>
+                <IonCardTitle>Play Ranked</IonCardTitle>
+                <IonCardSubtitle> Competitive match against an opponent of similar rank </IonCardSubtitle>
               </IonCardHeader>
             </IonItem>
 
-
+            {/*
             <IonCardContent>
             Keep close to Nature's heart... and break clear away, once in awhile,
             and climb a mountain or spend a week in the woods. Wash your spirit clean.
             </IonCardContent>
+            */}
         </IonCard>
-        </Link>
-
-        <Link to= {"/ai"} style = {{textDecoration: "None"}}>
         <IonCard style = {{cursor: "pointer"}}>
             <IonItem>
               <IonIcon slot = "start" icon = {desktopOutline}/>
               <IonCardHeader>
 
-                <IonCardTitle>Play AI</IonCardTitle>
-                <IonCardSubtitle> Play against AI of your choice </IonCardSubtitle>
+                <IonCardTitle>Play Unranked</IonCardTitle>
+                <IonCardSubtitle> Casual match against a random opponent </IonCardSubtitle>
               </IonCardHeader>
             </IonItem>
 
 
+            {/*
             <IonCardContent>
             Keep close to Nature's heart... and break clear away, once in awhile,
             and climb a mountain or spend a week in the woods. Wash your spirit clean.
             </IonCardContent>
+            */}
         </IonCard>
-        </Link>
-
-        <Link to={"/scenario"} style = {{textDecoration: "none"}}>
         <IonCard style = {{cursor: "pointer"}}>
             <IonItem>
               <IonIcon slot = "start" icon = {schoolOutline}/>
               <IonCardHeader>
 
-                <IonCardTitle> Learn Quantum Chess </IonCardTitle>
-                <IonCardSubtitle> Play through some custom scenarios to learn the game</IonCardSubtitle>
+                <IonCardTitle> Create Custom Game </IonCardTitle>
+                <IonCardSubtitle> Create a new Quantum Chess game with custom rules </IonCardSubtitle>
               </IonCardHeader>
             </IonItem>
 
 
+            {/*
             <IonCardContent>
             Keep close to Nature's heart... and break clear away, once in awhile,
             and climb a mountain or spend a week in the woods. Wash your spirit clean.
             </IonCardContent>
+            */}
         </IonCard>
-        </Link>
+        <IonCard style = {{cursor: "pointer"}}>
+            <IonItem>
+              <IonIcon slot = "start" icon = {schoolOutline}/>
+              <IonCardHeader>
 
+                <IonCardTitle> Join Custom game </IonCardTitle>
+                <IonCardSubtitle> Enter a game ID to join a custom game </IonCardSubtitle>
+              </IonCardHeader>
+            </IonItem>
+
+
+            {/*
+            <IonCardContent>
+            Keep close to Nature's heart... and break clear away, once in awhile,
+            and climb a mountain or spend a week in the woods. Wash your spirit clean.
+            </IonCardContent>
+            */}
+        </IonCard>
       </IonContent>
     )
   }
 }
 
-export default MainOptions;
+export default Online;

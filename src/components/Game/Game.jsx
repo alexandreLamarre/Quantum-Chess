@@ -20,7 +20,7 @@ class Game extends React.Component{
           <ChessBoard/>
         </div>
         <div className = "infoArea">
-          <GameTabs/>
+          
         </div>
       </div>
     )

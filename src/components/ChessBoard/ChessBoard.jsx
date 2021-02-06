@@ -29,6 +29,9 @@ class ChessBoard extends React.Component{
   componentDidMount(){
     //create new board
     const board = new QuantumBoard(this.props.scenario, this.props.fullBoard);
+    console.time("stringify")
+    const x = JSON.stringify(board);
+    console.timeEnd("stringify")
     const incheck_state = board.inCheck(this.state.player);
     const in_check_highlighted = [];
     in_check_highlighted.push(...incheck_state.ally_squares);

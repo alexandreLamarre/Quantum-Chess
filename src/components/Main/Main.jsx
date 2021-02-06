@@ -2,12 +2,18 @@ import React from "react";
 import {v4 as uuidv4} from "uuid";
 import ChessBoard from "../ChessBoard";
 import MainOptions from "../MainOptions";
+import Online from "../Online";
+import GameRooms from "../GameRooms";
+import AIOutline from "../AIOutline";
+import Scenarios from "../Scenarios";
+
 import {connect} from "../../api";
+import {BrowserRouter as Router, Route} from "react-router-dom";
 
 import { logoElectron, checkboxOutline,
-  closeCircleOutline } from 'ionicons/icons';
+  closeCircleOutline, logoOctocat, alertOutline, copyOutline } from 'ionicons/icons';
 import { IonGrid, IonRow, IonCol, IonContent, IonLabel, IonIcon,
-IonCard, IonItem} from '@ionic/react';
+IonCard, IonItem, IonChip} from '@ionic/react';
 import '@ionic/react/css/core.css';
 /* Basic CSS for apps built with Ionic */
 import '@ionic/react/css/normalize.css';
@@ -27,7 +33,7 @@ class Main extends React.Component{
   constructor(props){
     super(props);
     this.state = {
-      authenticated: false,
+      auth: false,
       local_id: null,
       games_played: 0,
       players_online: 0,
@@ -63,6 +69,7 @@ class Main extends React.Component{
 
   render(){
     return(
+      <Router>
       <IonContent>
         <IonGrid>
           <IonRow size = "1">
@@ -74,11 +81,21 @@ class Main extends React.Component{
                   <IonLabel> {this.state.games_played.toString() + " Games played"} </IonLabel>
                   <IonLabel> {this.state.players_online.toString() + " Players online"}</IonLabel>
                   <IonItem>
-                    <IonIcon slot = "end" icon = {this.state.server_status? checkboxOutline: closeCircleOutline}/>
+                    <IonIcon slot = "end"
+                    icon = {this.state.server_status? checkboxOutline: closeCircleOutline}
+                    style = {{backgroundColor:this.state.server_status?"rgba(0,255,0.7)": "rgba(255,0,0,0.5)"}}/>
                     <IonLabel> Server status</IonLabel>
                   </IonItem>
                 </IonItem>
               </IonCard>
+            </IonCol>
+          </IonRow>
+          <IonRow size = "1">
+            <IonCol size = "6">
+              {/* <User></User> --> Eventually where enemy username will go*/}
+            </IonCol>
+            <IonCol>
+
             </IonCol>
           </IonRow>
           <IonRow>
@@ -87,11 +104,45 @@ class Main extends React.Component{
               <ChessBoard fullBoard = {true} active = {true} highlight = {true}/>
             </IonCol>
             <IonCol>
-              <MainOptions />
+              <Route path = "/" exact component = {MainOptions} />
+              <Route path = "/online" exact component = {Online}/>
+              <Route path = "/online/gamerooms" exact component = {GameRooms}/>
+              <Route path = "/online/customgame/" exact />
+              <Route path = "/online/customgame/{id}" exact />
+              <Route path = "/online/public" exact />
+              <Route path = "/online/public/{id}" exact />
+              <Route path = "/online/ranked" exact />
+              <Route path = "/online/ranked/{id}" exact />
+              <Route path = "/ai" exact component = {AIOutline} />
+              <Route path = "/ai/{id}" exact />
+              <Route path = "/scenario" exact component = {Scenarios}/>
+              <Route path = "/scenario/{id}" exact />
+
+            </IonCol>
+
+          </IonRow>
+          <IonRow>
+            <IonCol size = "6">
+              {/* <User></User>   where your username will go*/}
+            </IonCol>
+            <IonCol style = {{display:"flex", justifyContent: "space-evenly"}}>
+              <IonChip>
+                <IonIcon icon = {logoOctocat}></IonIcon>
+                <IonLabel> Source Code </IonLabel>
+              </IonChip>
+              <IonChip>
+                <IonIcon icon = {alertOutline}></IonIcon>
+                <IonLabel> Report An Issue </IonLabel>
+              </IonChip>
+              <IonChip>
+                <IonIcon icon = {copyOutline}> </IonIcon>
+                <IonLabel> Quantum Chess Rules</IonLabel>
+              </IonChip>
             </IonCol>
           </IonRow>
         </IonGrid>
       </IonContent>
+      </Router>
 
     )
   }

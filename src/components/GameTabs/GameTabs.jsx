@@ -18,7 +18,7 @@ class GameTabs extends React.Component{
   render(){
     return(
       <div className = "gameTabs">
-        <Tabs forceRenderTabPanel= {true}>
+        <Tabs forceRenderTabPanel= {false}>
           <TabList>
             <Tab> Chat </Tab>
             <Tab> Log </Tab>
