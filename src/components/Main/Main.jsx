@@ -39,11 +39,21 @@ class Main extends React.Component{
   componentDidMount(){
     const v = uuidv4(); // assign basically a guest uuid
     this.setState({local_id:v})
-    connect(() => {this.doNothing()}, (v) => this.setServerStatus(v) )
+    connect((n) => {this.setNumPlayers(n)}, (v) => this.setServerStatus(v) )
+  }
+
+  setNumPlayers(n){
+    // console.log(n)
+    // console.log(n.data)
+    const data = JSON.parse(n.data);
+    // console.log(data)
+    if(data.type === 0){
+      this.setState({players_online: parseInt(data.body)})
+    }
   }
 
   setServerStatus(online){
-    console.log("server status set");
+    console.log("Server status set.");
     this.setState({server_status: online});
   }
 
