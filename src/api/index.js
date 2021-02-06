@@ -1,10 +1,11 @@
 var socket = new WebSocket("ws://localhost:8080/ws");
 
-let connect = (cb) => {
+let connect = (cb, server_status) => {
   console.log("Attempting Connection ...");
 
   socket.onopen = () => {
     console.log("Successfully Connected");
+    server_status(true);
   };
 
   socket.onmessage = msg => {
@@ -18,6 +19,7 @@ let connect = (cb) => {
 
   socket.onerror = error => {
     console.log("Socket Error: ", error);
+    server_status(false);
   };
 }
 
@@ -26,4 +28,9 @@ let sendMsg = msg =>{
   socket.send(msg);
 };
 
-export {connect, sendMsg};
+let sendMove = data =>{
+  console.log(data);
+  //send to socket
+}
+
+export {connect, sendMsg, sendMove};

@@ -2,7 +2,7 @@ import React from "react";
 import {v4 as uuidv4} from "uuid";
 import ChessBoard from "../ChessBoard";
 import MainOptions from "../MainOptions";
-
+import {connect} from "../../api";
 
 import { logoElectron, checkboxOutline,
   closeCircleOutline } from 'ionicons/icons';
@@ -31,7 +31,7 @@ class Main extends React.Component{
       local_id: null,
       games_played: 0,
       players_online: 0,
-      server_status: true,
+      server_status: false,
 
     }
   }
@@ -39,6 +39,16 @@ class Main extends React.Component{
   componentDidMount(){
     const v = uuidv4(); // assign basically a guest uuid
     this.setState({local_id:v})
+    connect(() => {this.doNothing()}, (v) => this.setServerStatus(v) )
+  }
+
+  setServerStatus(online){
+    console.log("server status set");
+    this.setState({server_status: online});
+  }
+
+  doNothing(){
+    return;
   }
 
   render(){
