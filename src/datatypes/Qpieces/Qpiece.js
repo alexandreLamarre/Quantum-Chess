@@ -217,7 +217,6 @@ function checkLowerRowKing(position, color, board, legal_moves){
       legal_moves.push(r);
     }
   }
-  console.log(l,m,r)
 }
 
 

@@ -102,7 +102,7 @@ class ChessBoard extends React.Component{
         }
       }
       this.drawInCheck(ctx, SIZE);
-      if(this.props.highlight) this.drawHighlighted(ctx, SIZE);
+      if(this.props.highlight) this.drawLegal(ctx, SIZE);
       this.drawPieces(ctx, board, SIZE);
   }
 
@@ -123,12 +123,12 @@ class ChessBoard extends React.Component{
     if(check_outcomes.ally) {
       var player = next_player === BLACK? "Black": 'White'
       var message = `${player} has won!`;
-      alert(message)
+      //alert(message)
     }
     //this.setState()
   }
 
-  drawHighlighted(ctx, size){
+  drawLegal(ctx, size){
     const highlighted = this.state.highlighted;
     for(let i = 0; i < highlighted.length; i++){
       ctx.beginPath();
@@ -265,19 +265,23 @@ class ChessBoard extends React.Component{
   }
 
   setDrag(e,v){
-    if(v){
-      const [highlighted, id, x, y] = this.updateHighlighted(e)
-      this.setState({dragging:true, selectedPiece: id, selectedX: x, selectedY:y,
-        highlighted: highlighted});
+    if(e.button === 0){
+      if(v){
+        const [highlighted, id, x, y] = this.updateHighlighted(e)
+        this.setState({dragging:true, selectedPiece: id, selectedX: x, selectedY:y,
+          highlighted: highlighted});
+      }
+      else{
+        this.setState({dragging: false, selectedPiece: null, highlighted: []})
+      }
     }
-    else{
-      this.setState({dragging: false, selectedPiece: null, highlighted: []})
-    }
+
 
   }
 
   handleMouseEventsOnCanvas(e){
-    if(this.state.dragging === true && this.state.selectedPiece !== null){
+    if(this.state.dragging === true && this.state.selectedPiece !== null
+                                                          && e.button === 0){
       const [x,y] = this.getMouseLocation(e);
       this.setState({selectedX: x, selectedY: y})
     }
@@ -288,13 +292,15 @@ class ChessBoard extends React.Component{
     return (
       <div className = "boardArea">
         <canvas ref = {this.canvas} id = "chessBoard"
-        style = {{cursor: this.state.selectedPiece=== null? "grab": "default"}}
+        style = {{
+                  outline: "1px solid black",
+                  cursor: this.state.selectedPiece === null? "default": "grabbing"
+                }}
         onMouseLeave = {(e) => this.setDrag(e, false)}
         onMouseDown = {(e) => this.setDrag(e,true)}
         onMouseMove = {(e) => this.handleMouseEventsOnCanvas(e)}
         onMouseUp = {(e) => {this.setDrag(e,false)}}
         onClick = {(e) => {this.updateBoard(e)}}
-        style = {{ outline: "1px solid black"}}
         className = "chessBoard"
         />
         <div className = "tooltip" hidden = {!this.state.hoverPiece}

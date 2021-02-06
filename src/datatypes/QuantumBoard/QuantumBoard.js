@@ -127,8 +127,8 @@ class QuantumBoard {
     // console.log("foe king spaces", foe_king_spaces);
     // console.log("ally_moves", ally_moves);
     // console.log("foe_moves", foe_moves);
-    console.log("White in check?", (color === WHITE && ally_in_check) || (color === BLACK && foe_in_check));
-    console.log("Black in check?", (color === BLACK && ally_in_check) || (color === WHITE && foe_in_check));
+    // console.log("White in check?", (color === WHITE && ally_in_check) || (color === BLACK && foe_in_check));
+    // console.log("Black in check?", (color === BLACK && ally_in_check) || (color === WHITE && foe_in_check));
 
     const other_color = color === WHITE? BLACK: WHITE;
     return {ally: ally_in_check, foe: foe_in_check,
