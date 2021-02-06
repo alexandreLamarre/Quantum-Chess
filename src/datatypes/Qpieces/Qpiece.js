@@ -44,22 +44,26 @@ class Qpiece{
     Quantum Circuit/action: ${this.action} \n
     `)
   }
+
+  isTrueKing(){
+    for(const state in this.states){
+      if(state === "King" && this.states[state] === 1) return true;
+    }
+    return false;
+  }
+
   /**
   @param id id of the piece that we select
   @param position the position on the board of the piece that we select
   @param board the quantum board everything takes place on
   **/
-  getLegalMoves(id,position, board){
+  getLegalMoves(id,position, board, capture = false){
     var states;
     const legal_moves = [];
-    //if it is not entangled with other states use the state stored in the Qpiece object
-    if(!board.entanglements[id]) states = this.states;
-    else{
-      // if it is entangled use the state stored by entanglements object;
-    }
+    states = this.states;
     for(const state in states){
       if(states[state] > 0){
-        this._getLegalMoveHelper(state, position, board, legal_moves);
+        this._getLegalMoveHelper(state, position, board, legal_moves, capture);
       }
     }
     return legal_moves;
@@ -71,9 +75,9 @@ class Qpiece{
   @param position the position of the piece on the board  0 =< position < 64
   @param board the quantum board
   **/
-  _getLegalMoveHelper(type, position, board, legal_moves){
+  _getLegalMoveHelper(type, position, board, legal_moves, capture){
     if(type === "Pawn"){
-      pawnMoves(position, this.color, this.moved, board, legal_moves);
+      pawnMoves(position, this.color, this.moved, board, legal_moves, capture);
     }
     else if(type === "Rook"){
       rookMoves(position, this.color, board, legal_moves);
@@ -100,19 +104,21 @@ class Qpiece{
 export default Qpiece;
 
 function kingMoves(position, color, board, legal_moves){
-  // check if it moves into check.
+  checkLeftRightKing(position, color, board, legal_moves);
+  checkUpperRowKing(position, color, board, legal_moves);
+  checkLowerRowKing(position, color, board, legal_moves);
 }
 
-function pawnMoves(position, color, moved, board, legal_moves){
+function pawnMoves(position, color, moved, board, legal_moves, capture){
   if(color === WHITE){
     checkCapture(position, -1, color, board, legal_moves);
     const dy = moved === false? -2: -1;
-    checkForward(position, dy, color, board, legal_moves);
+    if(capture === false ) checkForward(position, dy, color, board, legal_moves);
   }
   if(color === BLACK){
     checkCapture(position, 1, color, board, legal_moves);
     const dy = moved === false? 2: 1;
-    checkForward(position, dy, color, board, legal_moves);
+    if(capture === false) checkForward(position, dy, color, board, legal_moves);
   }
 }
 
@@ -137,6 +143,83 @@ function bishopMoves(position, color, board, legal_moves){
   checkLowerLeftDiagonal(lowerLeftDiagonal(position), color, board, legal_moves);
   checkLowerRightDiagonal(lowerRightDiagonal(position), color, board, legal_moves);
 }
+
+
+// ====================== CHECK KING ========================================
+
+function checkLeftRightKing(position, color, board, legal_moves){
+  if(!inBoard(position)) return;
+  const cur_row = getRow(position);
+  const l = 8*cur_row + position%8 - 1;
+  const r = 8*cur_row + position%8 + 1;
+  if(cur_row === getRow(l) && inBoard(l)){
+
+    if(board.getID(l) === null) legal_moves.push(l);
+    else{
+      const piece_color = board.getColor(l);
+      if(color !== piece_color) legal_moves.push(l);
+    }
+  }
+  if(cur_row === getRow(r) && inBoard(r)){
+
+    if(board.getID(r) === null) legal_moves.push(r);
+    else{
+      const piece_color = board.getColor(r);
+      if(color !== piece_color) legal_moves.push(r);
+    }
+  }
+}
+
+function checkUpperRowKing(position, color, board, legal_moves){
+  const u_row = getRow(position) -1;
+  if(!inBoardRow(u_row)) return;
+  const l = u_row*8 +position%8 -1;
+  const m = u_row*8 + position%8;
+  const r = u_row*8 + position%8 + 1;
+  if(inBoardRow(getRow(l)) && u_row === getRow(l)){
+    if(board.getID(l) === null) legal_moves.push(l);
+    else if(board.getColor(l) !== color){
+      legal_moves.push(l);
+    }
+  }
+  if(board.getID(m) === null) legal_moves.push(m);
+  else if(board.getColor(m) !== color){
+    legal_moves.push(m);
+  }
+  if(inBoardRow(getRow(r)) && u_row === getRow(r)){
+    if(board.getID(r) === null) legal_moves.push(r);
+    else if(board.getColor(r) !== color){
+      legal_moves.push(r);
+    }
+  }
+
+}
+
+function checkLowerRowKing(position, color, board, legal_moves){
+  const l_row = getRow(position) + 1;
+  if(!inBoardRow(l_row)) return;
+  const l = l_row*8 +position%8 -1;
+  const m = l_row*8 + position%8;
+  const r = l_row*8 + position%8 + 1;
+  if(inBoardRow(getRow(l)) && l_row === getRow(l)){
+    if(board.getID(l) === null) legal_moves.push(l);
+    else if(board.getColor(l) !== color){
+      legal_moves.push(l);
+    }
+  }
+  if(inBoard(m) && board.getID(m) === null) legal_moves.push(m);
+  else if(inBoard(m) && board.getColor(m) !== color){
+    legal_moves.push(m);
+  }
+  if(inBoardRow(getRow(r)) && l_row === getRow(r)){
+    if(board.getID(r) === null) legal_moves.push(r);
+    else if(board.getColor(r) !== color){
+      legal_moves.push(r);
+    }
+  }
+  console.log(l,m,r)
+}
+
 
 // ====================== CHECK PAWN =======================================
 

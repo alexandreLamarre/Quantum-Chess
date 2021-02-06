@@ -14,6 +14,7 @@ class ChessBoard extends React.Component{
       size: 0,
       board: [],
       highlighted: [],
+      in_check_highlighted: [],
       toolTipx: 0,
       toolTipy: 0,
       hoverPiece: false,
@@ -21,25 +22,37 @@ class ChessBoard extends React.Component{
       tooltip: "",
       player: WHITE,
       dragging:false,
+      active_player: WHITE,
     }
     this.canvas = React.createRef();
   }
   componentDidMount(){
+    //create new board
     const board = new QuantumBoard(this.props.scenario, this.props.fullBoard);
-    console.log(board)
+    const incheck_state = board.inCheck(this.state.player);
+    const in_check_highlighted = [];
+    in_check_highlighted.push(...incheck_state.ally_squares);
+    in_check_highlighted.push(...incheck_state.foe_squares);
+
+    //set up canvas
     const w = Math.floor(window.innerWidth/2);
     const h = Math.floor(window.innerHeight);
     var size = Math.min(w,h)*0.90;
     const canvas = this.canvas.current;
     size = Math.max(200, size);
-    size = Math.min(596, size);
+    size = Math.min(550, size);
     canvas.width = size;
     canvas.height = size;
+
+    //draw board
     this.drawBoard(board);
-    this.setState({size: size, board: board})
+    this.setState({size: size, board: board, in_check_highlighted: in_check_highlighted})
+
+    //set up window events
     window.addEventListener("resize", () => this.onResize() )
     window.requestAnimationFrame(() => this.animate());
   }
+
 
   animate(){
     this.drawBoard(this.state.board);
@@ -54,7 +67,9 @@ class ChessBoard extends React.Component{
     const canvas = this.canvas.current;
     if(!canvas) return;
     size = Math.max(200, size);
-    size = Math.min(596, size);
+    size = Math.min(550, size);
+    canvas.width = size;
+    canvas.height = size;
     this.setState({size:size});
 
   }
@@ -86,9 +101,31 @@ class ChessBoard extends React.Component{
           ctx.closePath();
         }
       }
+      this.drawInCheck(ctx, SIZE);
       if(this.props.highlight) this.drawHighlighted(ctx, SIZE);
       this.drawPieces(ctx, board, SIZE);
+  }
 
+  /**
+  Updates the response from the backend, after processing move
+  @param rsp the JSON string response
+  **/
+  updateBoard(rsp){
+    //parseJSONdata
+    this.state.board.update();
+    //use JSON data fields as necessary to update states of the board
+
+    const cur_player = this.state.active_player;
+    const next_player = swapPlayers(this.state.active_player);
+
+    //checks the unlikely scenario where a knight flipped a piece to put the king into check
+    const check_outcomes = this.state.board.inCheck(cur_player);
+    if(check_outcomes.ally) {
+      var player = next_player === BLACK? "Black": 'White'
+      var message = `${player} has won!`;
+      alert(message)
+    }
+    //this.setState()
   }
 
   drawHighlighted(ctx, size){
@@ -98,6 +135,19 @@ class ChessBoard extends React.Component{
       ctx.fillStyle = "rgba(0,255,0,0.5)";
       const x = highlighted[i]%8;
       const y = Math.floor(highlighted[i]/8)
+      ctx.fillRect(x*size, y*size, size, size);
+      ctx.fill();
+      ctx.closePath();
+    }
+  }
+
+  drawInCheck(ctx, size){
+    const incheck_highlighted = this.state.in_check_highlighted;
+    for(let i = 0; i < incheck_highlighted.length; i++){
+      ctx.beginPath();
+      ctx.fillStyle = "rgba(255,0,0,0.5)";
+      const x = incheck_highlighted[i]%8;
+      const y = Math.floor(incheck_highlighted[i]/8)
       ctx.fillRect(x*size, y*size, size, size);
       ctx.fill();
       ctx.closePath();
@@ -172,26 +222,55 @@ class ChessBoard extends React.Component{
     }
   }
 
+  updateHighlighted(e){
+    const square = this.getSquare(e)
+    const id = this.state.board.getID(square);
+    const [x,y] = this.getMouseLocation(e)
+    console.log("id of piece selected", id);
+    var highlighted;
+    if(id){
+      const piece = this.state.board.getPiece(id);
+      var legal_moves = piece.getLegalMoves(id, square, this.state.board);
+
+      if(piece.isTrueKing()){
+        const color = piece.color;
+        const other_color = color === WHITE? BLACK: WHITE;
+        var remove_moves = new Set();
+        const board_without_king = this.state.board.copy();
+        const index = board_without_king.board.indexOf(parseInt(id));
+        board_without_king.board[index] = null;
+        // delete board_without_king.pieces[id];
+        // delete board_without_king.entangled[id];
+        for(var opp_piece in this.state.board.pieces){
+          if(this.state.board.pieces[opp_piece].color === other_color){
+            const other_moves = board_without_king.pieces[opp_piece].getLegalMoves(
+              opp_piece,
+              board_without_king.board.indexOf(parseInt(opp_piece)),
+              board_without_king,
+              true
+            );
+            other_moves.forEach(item => remove_moves.add(item));
+          }
+        }
+
+        legal_moves = legal_moves.filter(x => !remove_moves.has(x));
+      }
+      highlighted = legal_moves;
+      // console.log("legalmoves", legal_moves)
+    }
+    else{
+      highlighted = [];
+    }
+    return [highlighted, id, x, y];
+  }
+
   setDrag(e,v){
     if(v){
-      const square = this.getSquare(e)
-      const id = this.state.board.getID(square);
-      const [x,y] = this.getMouseLocation(e)
-      console.log("id of piece selected", id);
-      var highlighted;
-      if(id){
-        const legal_moves = this.state.board.getPiece(id).getLegalMoves(id, square, this.state.board);
-        highlighted = legal_moves;
-        console.log("legalmoves", legal_moves)
-      }
-      else{
-        highlighted = [];
-      }
+      const [highlighted, id, x, y] = this.updateHighlighted(e)
       this.setState({dragging:true, selectedPiece: id, selectedX: x, selectedY:y,
         highlighted: highlighted});
     }
     else{
-      console.log(this.getSquare(e));
       this.setState({dragging: false, selectedPiece: null, highlighted: []})
     }
 
@@ -214,6 +293,7 @@ class ChessBoard extends React.Component{
         onMouseDown = {(e) => this.setDrag(e,true)}
         onMouseMove = {(e) => this.handleMouseEventsOnCanvas(e)}
         onMouseUp = {(e) => {this.setDrag(e,false)}}
+        onClick = {(e) => {this.updateBoard(e)}}
         style = {{ outline: "1px solid black"}}
         className = "chessBoard"
         />
@@ -228,3 +308,7 @@ class ChessBoard extends React.Component{
 }
 
 export default ChessBoard;
+
+function swapPlayers(color){
+  return color === WHITE? BLACK:WHITE;
+}
