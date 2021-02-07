@@ -28,6 +28,7 @@ class Qpiece{
     if(!initialState || stateSpace.size !== initialState.length){
       console.log("Invalid initial state for Q-piece")
       this.initialState = {};
+      this.states = this.initialState;
      }
      else{
        this.initialState = {};
@@ -35,6 +36,11 @@ class Qpiece{
        this.stateSpace.forEach(key => this.initialState[key] = initialState[i++])
        this.states = this.initialState;
      }
+  }
+
+  toJSON(){
+    return {color: this.color, stateSpace: this.stateSpace, action: this.action,
+            initialState: this.initialState, states: this.states}
   }
 
   parseTooltip(){

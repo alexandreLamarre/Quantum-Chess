@@ -19,7 +19,7 @@ class QuantumBoard {
       this.board = res[0];
       this.pieces = res[1];
       this.entanglements = res[2];
-
+      this.player = WHITE;
     }
 
     else if(scenario){
@@ -34,6 +34,21 @@ class QuantumBoard {
 
   copy(){
     return new QuantumBoard(false, false, true, this.board.slice(), this.pieces, this.entanglements);
+  }
+
+  toJSON(){
+    const board = this.board;
+    const pieces = {};
+    for(const key in this.pieces){
+      pieces[key] = this.pieces[key].toJSON()
+    }
+    const entanglements = this.entanglements;
+    return {board: board, pieces: pieces, entanglements: entanglements}
+  }
+
+  nextPlayer(){
+    if(this.player === WHITE) this.player = BLACK;
+    else if(this.player === BLACK) this.player = WHITE;
   }
 
   /**
@@ -61,7 +76,11 @@ class QuantumBoard {
     return this.pieces[id];
   }
 
-  update(){
+  /**
+  Update the board using JSON response
+  @param rsp JSON
+  **/
+  update(rsp){
 
   };
 
