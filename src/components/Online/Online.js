@@ -16,7 +16,8 @@ import '@ionic/react/css/text-alignment.css';
 import '@ionic/react/css/text-transformation.css';
 import '@ionic/react/css/flex-utils.css';
 import '@ionic/react/css/display.css';
-import {arrowBackOutline, schoolOutline, globeOutline, desktopOutline, logoOctocat, alertOutline, copyOutline} from "ionicons/icons";
+import {arrowBackOutline, arrowForwardCircleOutline,
+   schoolOutline, globeOutline, bulbOutline, accessibilityOutline, alertOutline, copyOutline} from "ionicons/icons";
 import {IonContent, IonTitle, IonButton, IonCard, IonCardHeader, IonCardSubtitle,
   IonCardTitle, IonCardContent, IonIcon, IonItem, IonChip, IonLabel} from '@ionic/react';
 
@@ -29,7 +30,7 @@ class Online extends React.Component{
   }
 
   componentDidMount(){
-    // fetch the game rooms currently 
+    // fetch the game rooms currently
   }
 
   render(){
@@ -54,6 +55,8 @@ class Online extends React.Component{
           </IonTitle>
           </Link>
         </IonItem>
+
+        <Link to ={"/online/ranked"} style = {{textDecoration: "none"}}>
         <IonCard style = {{cursor: "pointer"}}>
             <IonItem>
               <IonIcon slot = "start" icon = {globeOutline}/>
@@ -71,9 +74,12 @@ class Online extends React.Component{
             </IonCardContent>
             */}
         </IonCard>
+        </Link>
+
+        <Link to = {"/online/public"} style = {{textDecoration: "none"}}>
         <IonCard style = {{cursor: "pointer"}}>
             <IonItem>
-              <IonIcon slot = "start" icon = {desktopOutline}/>
+              <IonIcon slot = "start" icon = {accessibilityOutline}/>
               <IonCardHeader>
 
                 <IonCardTitle>Play Unranked</IonCardTitle>
@@ -89,9 +95,11 @@ class Online extends React.Component{
             </IonCardContent>
             */}
         </IonCard>
+        </Link>
+
         <IonCard style = {{cursor: "pointer"}}>
             <IonItem>
-              <IonIcon slot = "start" icon = {schoolOutline}/>
+              <IonIcon slot = "start" icon = {bulbOutline}/>
               <IonCardHeader>
 
                 <IonCardTitle> Create Custom Game </IonCardTitle>
@@ -107,9 +115,10 @@ class Online extends React.Component{
             </IonCardContent>
             */}
         </IonCard>
+
         <IonCard style = {{cursor: "pointer"}}>
             <IonItem>
-              <IonIcon slot = "start" icon = {schoolOutline}/>
+              <IonIcon slot = "start" icon = {arrowForwardCircleOutline}/>
               <IonCardHeader>
 
                 <IonCardTitle> Join Custom game </IonCardTitle>

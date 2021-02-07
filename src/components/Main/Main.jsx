@@ -6,12 +6,16 @@ import Online from "../Online";
 import GameRooms from "../GameRooms";
 import AIOutline from "../AIOutline";
 import Scenarios from "../Scenarios";
+import RankedQueue from "../RankedQueue";
+import PublicQueue from "../PublicQueue";
+import User from "../User";
+import {BACKEND_URL} from "../../api";
 
 import {connect} from "../../api";
 import {BrowserRouter as Router, Route} from "react-router-dom";
 
 import { logoElectron, checkboxOutline,
-  closeCircleOutline, logoOctocat, alertOutline, copyOutline } from 'ionicons/icons';
+  closeCircleOutline, logoOctocat, alertOutline, copyOutline, personCircleOutline } from 'ionicons/icons';
 import { IonGrid, IonRow, IonCol, IonContent, IonLabel, IonIcon,
 IonCard, IonItem, IonChip} from '@ionic/react';
 import '@ionic/react/css/core.css';
@@ -34,37 +38,36 @@ class Main extends React.Component{
     super(props);
     this.state = {
       auth: false,
-      local_id: null,
-      games_played: 0,
-      players_online: 0,
+      id: null,
+      games_played: "- - ",
+      players_online: "- -",
       server_status: false,
-
+      ranked_queue: "- -",
+      public_queue: "- - ",
     }
   }
 
   componentDidMount(){
-    const v = uuidv4(); // assign basically a guest uuid
-    this.setState({local_id:v})
-    connect((n) => {this.setNumPlayers(n)}, (v) => this.setServerStatus(v) )
+
+    const v = uuidv4(); // assign a guest uuid
+    console.log(v);
+    var socket = new WebSocket(BACKEND_URL + "/ws/" + v);
+    this.setState({socket: socket, id:v});
+    connect(socket, (rsp) => {this.parseServerResponse(rsp)}, (v) => this.setServerStatus(v) )
   }
 
-  setNumPlayers(n){
-    // console.log(n)
-    // console.log(n.data)
-    const data = JSON.parse(n.data);
-    // console.log(data)
-    if(data.type === 0){
-      this.setState({players_online: parseInt(data.body)})
+  parseServerResponse(rsp){
+    const data = JSON.parse(rsp.data);
+    console.log(data)
+    if(parseInt(data.Type) === 0){
+      console.log(data.players);
+      this.setState({players_online: data.players})
     }
   }
 
   setServerStatus(online){
     console.log("Server status set.");
     this.setState({server_status: online});
-  }
-
-  doNothing(){
-    return;
   }
 
   render(){
@@ -79,7 +82,7 @@ class Main extends React.Component{
                   <IonIcon icon = {logoElectron} slot = "start"/>
                   <IonLabel> Quantum Chess</IonLabel>
                   <IonLabel> {this.state.games_played.toString() + " Games played"} </IonLabel>
-                  <IonLabel> {this.state.players_online.toString() + " Players online"}</IonLabel>
+                  <IonLabel> {this.state.players_online + " Players online"}</IonLabel>
                   <IonItem>
                     <IonIcon slot = "end"
                     icon = {this.state.server_status? checkboxOutline: closeCircleOutline}
@@ -109,9 +112,13 @@ class Main extends React.Component{
               <Route path = "/online/gamerooms" exact component = {GameRooms}/>
               <Route path = "/online/customgame/" exact />
               <Route path = "/online/customgame/{id}" exact />
-              <Route path = "/online/public" exact />
+              <Route path = "/online/public" exact
+                  render = {() => <PublicQueue socket = {this.state.socket}
+                  pid = {this.state.id} queueSize = {this.state.public_queue}/>}/>
               <Route path = "/online/public/{id}" exact />
-              <Route path = "/online/ranked" exact />
+              <Route path = "/online/ranked" exact
+                  render = {() => <RankedQueue socket = {this.state.socket}
+                  pid = {this.state.id} queueSize = {this.state.ranked_queue}/> }/>
               <Route path = "/online/ranked/{id}" exact />
               <Route path = "/ai" exact component = {AIOutline} />
               <Route path = "/ai/{id}" exact />
@@ -123,7 +130,15 @@ class Main extends React.Component{
           </IonRow>
           <IonRow>
             <IonCol size = "6">
-              {/* <User></User>   where your username will go*/}
+
+
+            {/* <User></User>   where your username will go*/}
+            <User
+            name = {this.state.auth? "John Doe": "Guest -"+this.state.id}
+            icon = {personCircleOutline}>
+            </User>
+
+
             </IonCol>
             <IonCol style = {{display:"flex", justifyContent: "space-evenly"}}>
               <IonChip>

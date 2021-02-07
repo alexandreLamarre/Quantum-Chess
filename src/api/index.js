@@ -1,6 +1,7 @@
-var socket = new WebSocket("ws://localhost:8080/ws");
+export const BACKEND_URL = "ws://localhost:8080"
 
-let connect = (cb, server_status) => {
+
+let connect = (socket,cb, server_status) => {
   console.log("Attempting Connection ...");
 
   socket.onopen = () => {
@@ -15,6 +16,7 @@ let connect = (cb, server_status) => {
 
   socket.onclose = event => {
     console.log("Socket Closed Connection: ", event);
+    server_status(false);
   };
 
   socket.onerror = error => {
@@ -23,14 +25,24 @@ let connect = (cb, server_status) => {
   };
 }
 
-let sendMsg = msg =>{
+let sendMsg = (socket,msg) =>{
   console.log("sending msg:", msg);
   socket.send(msg);
 };
 
-let sendMove = data =>{
+/**
+socket: the websocket
+qid = 1 RANKED QUEUE
+qid = 2 UNRANKED QUEUE
+pid = player id
+**/
+let joinQueue = (socket,qid,pid) => {
+  console.log("registering player", pid, "in queue ", qid);
+  const data = JSON.stringify({type: 2, queue: qid.toString(), id: pid.toString() });
   console.log(data);
-  //send to socket
+  socket.send(data)
 }
 
-export {connect, sendMsg, sendMove};
+
+
+export {connect, sendMsg, joinQueue};
