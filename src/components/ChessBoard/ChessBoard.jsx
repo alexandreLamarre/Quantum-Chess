@@ -20,18 +20,20 @@ class ChessBoard extends React.Component{
       hoverPiece: false,
       selectedPiece: null,
       tooltip: "",
-      player: WHITE,
       dragging:false,
-      active_player: WHITE,
+      awaitingResponse: false,
+      player: WHITE,
     }
     this.canvas = React.createRef();
   }
+
   componentDidMount(){
     //create new board
     const board = new QuantumBoard(this.props.scenario, this.props.fullBoard);
     console.time("stringify")
-    const x = JSON.stringify(board);
+    const x = board.toJSON();
     console.timeEnd("stringify")
+    console.log("board to JSON", x);
     const incheck_state = board.inCheck(this.state.player);
     const in_check_highlighted = [];
     in_check_highlighted.push(...incheck_state.ally_squares);
@@ -114,21 +116,24 @@ class ChessBoard extends React.Component{
   @param rsp the JSON string response
   **/
   updateBoard(rsp){
+    console.log("updating board...");
+    const cur_player = this.state.board.player;
     //parseJSONdata
     this.state.board.update();
     //use JSON data fields as necessary to update states of the board
 
-    const cur_player = this.state.active_player;
-    const next_player = swapPlayers(this.state.active_player);
+
 
     //checks the unlikely scenario where a knight flipped a piece to put the king into check
     const check_outcomes = this.state.board.inCheck(cur_player);
     if(check_outcomes.ally) {
-      var player = next_player === BLACK? "Black": 'White'
+      var player = cur_player === BLACK? "White": "BLACK";
       var message = `${player} has won!`;
       //alert(message)
     }
     //this.setState()
+    this.state.board.nextPlayer();
+    this.setState({awaitingResponse: false});
   }
 
   drawLegal(ctx, size){
@@ -161,18 +166,37 @@ class ChessBoard extends React.Component{
 
     const positions = board.board;
     const moving_id = this.state.selectedPiece;
+
+
+
     for(let i = 0; i < positions.length; i++){
       if(positions[i]){
         const id = positions[i];
         const piece = board.pieces[positions[i]];
-        if(id === moving_id){ this.drawPieceText(ctx, piece, size, this.state.selectedX-size/2, this.state.selectedY+size/2)}
-        else{this.drawPieceText(ctx, piece,size, i%8 * size, (Math.floor(i/8)+1) * size )}
+        if(id !== moving_id)this.drawPieceText(ctx, piece,size, i%8 * size, (Math.floor(i/8)+1) * size )
 
         if(!board.entanglements[id]){
           //DRAW ENTAGLEMENTS
         }
         else{
           //DRAW ENTANGLEMENTS
+        }
+      }
+    }
+    if(moving_id){
+      for(let i = 0; i < positions.length; i++){
+        if(positions[i]){
+          const id = positions[i];
+          const piece = board.pieces[positions[i]];
+          if(id === moving_id){ this.drawPieceText(ctx, piece, size, this.state.selectedX-size/2, this.state.selectedY+size/2)}
+
+
+          if(!board.entanglements[id]){
+            //DRAW ENTAGLEMENTS
+          }
+          else{
+            //DRAW ENTANGLEMENTS
+          }
         }
       }
     }
@@ -268,26 +292,39 @@ class ChessBoard extends React.Component{
   }
 
   setDrag(e,v){
-    if(e.button === 0){
-      if(v){
+    if(e.button === 0 && !this.state.awaitingResponse){
+      if(v && this.state.board.player === this.state.player){
         const [highlighted, id, x, y] = this.updateHighlighted(e)
+        console.log(highlighted, id, x, y);
+        if(id === null) return;
+        if(this.state.board.pieces[id] === undefined) return;
+        if(this.state.board.pieces[id].color !== this.state.player) return;
         this.setState({dragging:true, selectedPiece: id, selectedX: x, selectedY:y,
-          highlighted: highlighted});
+          highlighted: highlighted, moveStart: this.getSquare(e)});
       }
       else{
+        if(this.state.selectedPiece && !this.state.awaitingResponse){
+          this.sendMove(this.state.moveStart, this.getSquare(e), this.state.highlighted);
+        }
         this.setState({dragging: false, selectedPiece: null, highlighted: []})
       }
     }
-
-
   }
 
   handleMouseEventsOnCanvas(e){
     if(this.state.dragging === true && this.state.selectedPiece !== null
-                                                          && e.button === 0){
+              && e.button === 0 && this.state.board.player === this.state.player){
       const [x,y] = this.getMouseLocation(e);
       this.setState({selectedX: x, selectedY: y})
     }
+  }
+
+  sendMove(start, end, legal_moves){
+    if(start === end) return;
+    if(!legal_moves.includes(end)) return;
+    console.log("move", start, end);
+    this.setState({awaitingResponse:true})
+    this.updateBoard();
   }
 
   render(){
@@ -303,7 +340,7 @@ class ChessBoard extends React.Component{
         onMouseDown = {(e) => this.setDrag(e,true)}
         onMouseMove = {(e) => this.handleMouseEventsOnCanvas(e)}
         onMouseUp = {(e) => {this.setDrag(e,false)}}
-        onClick = {(e) => {this.updateBoard(e)}}
+        onClick = {(e) => {}}
         className = "chessBoard"
         />
         <div className = "tooltip" hidden = {!this.state.hoverPiece}
@@ -317,7 +354,3 @@ class ChessBoard extends React.Component{
 }
 
 export default ChessBoard;
-
-function swapPlayers(color){
-  return color === WHITE? BLACK:WHITE;
-}

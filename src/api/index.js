@@ -31,14 +31,14 @@ let sendMsg = (socket,msg) =>{
 };
 
 /**
-socket: the websocket
+socket: the websockew
 qid = 1 RANKED QUEUE
 qid = 2 UNRANKED QUEUE
 pid = player id
 **/
 let joinQueue = (socket,qid,pid) => {
   console.log("registering player", pid, "in queue ", qid);
-  const data = JSON.stringify({type: 2, queue: qid.toString(), id: pid.toString() });
+  const data = JSON.stringify({type: 2, queue: qid.toString(), id: pid.toString()});
   console.log(data);
   socket.send(data)
 }

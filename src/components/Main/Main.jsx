@@ -32,6 +32,8 @@ import '@ionic/react/css/text-transformation.css';
 import '@ionic/react/css/flex-utils.css';
 import '@ionic/react/css/display.css';
 
+const WHITE = 0;
+const BLACK = 1;
 
 class Main extends React.Component{
   constructor(props){
@@ -39,11 +41,16 @@ class Main extends React.Component{
     this.state = {
       auth: false,
       id: null,
+      player:WHITE,
       games_played: "- - ",
       players_online: "- -",
       server_status: false,
       ranked_queue: "- -",
       public_queue: "- - ",
+      gameSocket: null,
+      other_player: null,
+      other_player_name: null,
+      other_player_icon: null,
     }
   }
 
@@ -56,12 +63,25 @@ class Main extends React.Component{
     connect(socket, (rsp) => {this.parseServerResponse(rsp)}, (v) => this.setServerStatus(v) )
   }
 
+  createGameSocket(id){
+    var gameSocket = new WebSocket(BACKEND_URL + "/game/" + id);
+
+    this.setState({gameSocket: gameSocket});
+  }
+
   parseServerResponse(rsp){
     const data = JSON.parse(rsp.data);
     console.log(data)
-    if(parseInt(data.Type) === 0){
+    if(parseInt(data.Type) === 0){ // TYPE == 0 updates player count
       console.log(data.players);
       this.setState({players_online: data.players})
+    }
+    else if(parseInt(data.Type) === 1){ // TYPE == 1 updates queue lengths;
+
+    }
+    else if(parseInt(data.Type) === 2){ //TYPE == 2  has matched two players and will connect them
+      const id = ""
+      this.createGameSocket(id);
     }
   }
 
@@ -81,7 +101,7 @@ class Main extends React.Component{
                 <IonItem>
                   <IonIcon icon = {logoElectron} slot = "start"/>
                   <IonLabel> Quantum Chess</IonLabel>
-                  <IonLabel> {this.state.games_played.toString() + " Games played"} </IonLabel>
+                  <IonLabel> {this.state.games_played.toString() + " Total Games played"} </IonLabel>
                   <IonLabel> {this.state.players_online + " Players online"}</IonLabel>
                   <IonItem>
                     <IonIcon slot = "end"
@@ -95,7 +115,13 @@ class Main extends React.Component{
           </IonRow>
           <IonRow size = "1">
             <IonCol size = "6">
-              {/* <User></User> --> Eventually where enemy username will go*/}
+
+            {/*Opponent */}
+            <div hidden = {this.state.other_player === null}>
+            <User  name = {this.state.other_player_name}
+            icon = {this.state.other_player_icon} />
+            </div>
+
             </IonCol>
             <IonCol>
 
@@ -104,7 +130,8 @@ class Main extends React.Component{
           <IonRow>
             <IonCol>
             {/*ACTIVE = TRUE only for testing, otherwise undefined, or better yet, false. */}
-              <ChessBoard fullBoard = {true} active = {true} highlight = {true}/>
+              <ChessBoard player = {this.state.player}
+              fullBoard = {true} active = {true} highlight = {true}/>
             </IonCol>
             <IonCol>
               <Route path = "/" exact component = {MainOptions} />

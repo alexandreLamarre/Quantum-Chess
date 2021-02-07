@@ -35,9 +35,11 @@ class MainOptions extends React.Component{
 
     return(
       <IonContent style = {{cursor: "default"}}>
+      <IonItem>
         <IonTitle>
           Learn & Play Quantum Chess
         </IonTitle>
+      </IonItem>
         <Link to = {"/online"} style = {{textDecoration: 'none'}}>
         <IonCard style = {{cursor: "pointer"}}>
             <IonItem>
