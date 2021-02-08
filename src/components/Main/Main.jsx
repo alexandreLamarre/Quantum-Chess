@@ -44,7 +44,7 @@ class Main extends React.Component{
       id: null,
       player:WHITE,
       games_played: "- - ",
-      players_online: "- -",
+      players_online: "- - ",
       server_status: false,
       ranked_queue: "- -",
       public_queue: "- - ",
@@ -53,6 +53,7 @@ class Main extends React.Component{
       other_player_name: null,
       other_player_icon: null,
     }
+    this.chess = React.createRef();
   }
 
   componentDidMount(){
@@ -93,12 +94,30 @@ class Main extends React.Component{
   }
 
   handleGameResponse(rsp){
+    const data = JSON.parse(rsp.data);
+    console.log("game data", data);
+    if(parseInt(data.Type) === 0){ //player connected
 
+    } else if (parseInt(data.Type) === 1){ //board update
+
+      //1. update board
+      //parseBoardData
+
+      //this.chess.current.updateBoard(BoardData)
+      //2. update move log
+      //send string representation of move to move log
+
+    } else if (parseInt(data.Type) === 2){ // chat update
+      //send string update to chat 
+    }
   }
 
   setServerStatus(online){
     console.log("Server status set.");
     this.setState({server_status: online});
+    if(!online){
+      this.setState({ players_online: "- - ", games_played: "- -"})
+    }
   }
 
   render(){
@@ -141,7 +160,8 @@ class Main extends React.Component{
           <IonRow>
             <IonCol>
             {/*ACTIVE = TRUE only for testing, otherwise undefined, or better yet, false. */}
-              <ChessBoard player = {this.state.player}
+              <ChessBoard ref = {this.chess}
+              main = {this} player = {this.state.player}
               fullBoard = {true} active = {true} highlight = {true}/>
             </IonCol>
             <IonCol>

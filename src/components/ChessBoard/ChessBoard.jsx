@@ -1,7 +1,8 @@
 import React from "react";
 import "./ChessBoard.css";
 import QuantumBoard from  "../../datatypes/QuantumBoard";
-var FLIPPED = false;
+import {sendMsg} from "../../api";
+var FLIPPED = true;
 
 const WHITE = 0;
 const BLACK = 1;
@@ -25,6 +26,7 @@ class ChessBoard extends React.Component{
       player: WHITE,
     }
     this.canvas = React.createRef();
+    this.main = this.props.main;
   }
 
   componentDidMount(){
@@ -50,8 +52,9 @@ class ChessBoard extends React.Component{
     canvas.height = size;
 
     //draw board
-    this.drawBoard(board);
-    this.setState({size: size, board: board, in_check_highlighted: in_check_highlighted})
+    var flipped = this.state.player === BLACK;
+
+    this.setState({size: size, board: board, in_check_highlighted: in_check_highlighted, flipped: flipped})
 
     //set up window events
     window.addEventListener("resize", () => this.onResize() )
@@ -60,7 +63,7 @@ class ChessBoard extends React.Component{
 
 
   animate(){
-    this.drawBoard(this.state.board);
+    this.drawBoard(this.state.board, this.state.flipped);
     requestAnimationFrame(() => this.animate())
   }
 
@@ -79,7 +82,7 @@ class ChessBoard extends React.Component{
 
   }
 
-  drawBoard(board){
+  drawBoard(board, flipped){
       //draw initialBoard
       const canvas = this.canvas.current;
       if(!canvas){
@@ -91,10 +94,17 @@ class ChessBoard extends React.Component{
         console.log("canvas context is undefined, Unexpected");
         return;
       }
+      var constant = 0;
+      var d = -1;
+      if(flipped) {
+        constant = canvas.width*(7/8);
+        d = +1;
+      }
+      ctx.clearRect(0,0, canvas.width, canvas.width);
       const SIZE = canvas.width/8;
       // draw board
-      for(let i = 0; i < SIZE; i++){
-        for(let j = 0; j < SIZE; j++){
+      for(let i = 0; i < 8; i++){
+        for(let j = 0; j < 8; j++){
           if((i + j)%2 === 0){
             ctx.fillStyle = "#EAE3C9";
           }
@@ -102,13 +112,13 @@ class ChessBoard extends React.Component{
             ctx.fillStyle = "#A67A5B";
           }
           ctx.beginPath();
-          ctx.fillRect(i*SIZE, j*SIZE, SIZE, SIZE);
+          ctx.fillRect(constant-d*i*SIZE, constant-d*j*SIZE, SIZE, SIZE);
           ctx.closePath();
         }
       }
-      this.drawInCheck(ctx, SIZE);
-      if(this.props.highlight) this.drawLegal(ctx, SIZE);
-      this.drawPieces(ctx, board, SIZE);
+      this.drawInCheck(ctx, SIZE, flipped);
+      if(this.props.highlight) this.drawLegal(ctx, SIZE, flipped);
+      this.drawPieces(ctx, board, SIZE, flipped);
   }
 
   /**
@@ -136,33 +146,48 @@ class ChessBoard extends React.Component{
     this.setState({awaitingResponse: false});
   }
 
-  drawLegal(ctx, size){
+  drawLegal(ctx, size, flipped){
+    var constant = 0;
+    var d = -1;
+    if(flipped){
+      constant = size*7;
+      d = 1;
+    }
+
     const highlighted = this.state.highlighted;
     for(let i = 0; i < highlighted.length; i++){
       ctx.beginPath();
       ctx.fillStyle = "rgba(0,255,0,0.5)";
       const x = highlighted[i]%8;
       const y = Math.floor(highlighted[i]/8)
-      ctx.fillRect(x*size, y*size, size, size);
+
+      ctx.fillRect(constant - d*x*size, constant - d*y*size, size, size);
       ctx.fill();
       ctx.closePath();
     }
   }
 
-  drawInCheck(ctx, size){
+  drawInCheck(ctx, size, flipped){
+    var constant = 0;
+    var d = -1;
+    if(flipped){
+      constant = size*7;
+      d = 1;
+    }
+
     const incheck_highlighted = this.state.in_check_highlighted;
     for(let i = 0; i < incheck_highlighted.length; i++){
       ctx.beginPath();
       ctx.fillStyle = "rgba(255,0,0,0.5)";
       const x = incheck_highlighted[i]%8;
       const y = Math.floor(incheck_highlighted[i]/8)
-      ctx.fillRect(x*size, y*size, size, size);
+      ctx.fillRect(constant - d*x*size, constant-d*y*size, size, size);
       ctx.fill();
       ctx.closePath();
     }
   }
 
-  drawPieces(ctx, board, size){
+  drawPieces(ctx, board, size, flipped){
 
     const positions = board.board;
     const moving_id = this.state.selectedPiece;
@@ -173,7 +198,7 @@ class ChessBoard extends React.Component{
       if(positions[i]){
         const id = positions[i];
         const piece = board.pieces[positions[i]];
-        if(id !== moving_id)this.drawPieceText(ctx, piece,size, i%8 * size, (Math.floor(i/8)+1) * size )
+        if(id !== moving_id)this.drawPieceText(ctx, piece,size, i%8 * size, (Math.floor(i/8)+1) * size, flipped )
 
         if(!board.entanglements[id]){
           //DRAW ENTAGLEMENTS
@@ -202,19 +227,28 @@ class ChessBoard extends React.Component{
     }
   }
 
-  drawPieceText(ctx, piece, size, x, y){
+  drawPieceText(ctx, piece, size, x, y, flipped){
+    var constantX = 0;
+    var constantY = 0;
+    var d = -1;
+    if(flipped){
+      constantX = size*7
+      constantY = size*9;
+      d = +1;
+    }
+
     const unicode = piece.model;
     const color = piece.color === WHITE? "rgb(255,255,255)": "rgb(0,0,0)";
     ctx.beginPath();
     ctx.fillStyle = color;
     ctx.font = (size*9/10).toString() + "px serif";
-    ctx.fillText(unicode, x, y-size/10);
+    ctx.fillText(unicode, constantX - d*x, constantY-d*(y)-size/10);
     ctx.fill();
     ctx.closePath();
     ctx.beginPath();
     ctx.strokeStyle = "rgb(0,0,0)";
     ctx.font = (size*9/10).toString() + "px serif";
-    ctx.strokeText(unicode, x, y-size/10);
+    ctx.strokeText(unicode, constantX - d*x, constantY - d*(y)-size/10);
     ctx.stroke();
     ctx.closePath();
   }
@@ -228,11 +262,17 @@ class ChessBoard extends React.Component{
   }
 
   getSquare(e){
+    var constant = 0;
+    var d = -1;
+    if(this.state.flipped){
+      constant = this.canvas.current.width;
+      d = +1;
+    }
     const canvas = this.canvas.current;
     const SIZE = canvas.width/8;
     const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const x = constant - d*(e.clientX - rect.left);
+    const y = constant -d*(e.clientY - rect.top);
     return Math.floor(x/SIZE)+ 8*Math.floor(y/SIZE);
   }
 
@@ -322,9 +362,14 @@ class ChessBoard extends React.Component{
   sendMove(start, end, legal_moves){
     if(start === end) return;
     if(!legal_moves.includes(end)) return;
+    // if(!this.main.state.gameSocket) {
+    //   console.log("Not connected to a game socket");
+    //   return;
+    // }
     console.log("move", start, end);
-    this.setState({awaitingResponse:true})
-    this.updateBoard();
+    console.log(this.state.board.toJSON());
+    // this.setState({awaitingResponse:true})
+    // sendMsg()
   }
 
   render(){
