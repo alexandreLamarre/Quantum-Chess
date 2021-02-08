@@ -8,10 +8,11 @@ import AIOutline from "../AIOutline";
 import Scenarios from "../Scenarios";
 import RankedQueue from "../RankedQueue";
 import PublicQueue from "../PublicQueue";
+import CreateGame from "../CreateGame";
 import User from "../User";
 import {BACKEND_URL} from "../../api";
 
-import {connect} from "../../api";
+import {connect, connectGame} from "../../api";
 import {BrowserRouter as Router, Route} from "react-router-dom";
 
 import { logoElectron, checkboxOutline,
@@ -57,19 +58,25 @@ class Main extends React.Component{
   componentDidMount(){
 
     const v = uuidv4(); // assign a guest uuid
-    console.log(v);
+    console.log("Client id", v);
     var socket = new WebSocket(BACKEND_URL + "/ws/" + v);
     this.setState({socket: socket, id:v});
-    connect(socket, (rsp) => {this.parseServerResponse(rsp)}, (v) => this.setServerStatus(v) )
+    connect(socket, (rsp) => {this.handleServerResponse(rsp)}, (v) => this.setServerStatus(v))
+    //this.createGameSocket(v);
   }
 
+  /**
+  @param id the user id trying to connect to game
+  **/
   createGameSocket(id){
-    var gameSocket = new WebSocket(BACKEND_URL + "/game/" + id);
-
+    const gid = uuidv4();
+    console.log("Game id", gid);
+    var gameSocket = new WebSocket(BACKEND_URL + "/game/" + gid+ "/"+ id);
     this.setState({gameSocket: gameSocket});
+    connectGame(gameSocket, (rsp) => {this.handleGameResponse(rsp)});
   }
 
-  parseServerResponse(rsp){
+  handleServerResponse(rsp){
     const data = JSON.parse(rsp.data);
     console.log(data)
     if(parseInt(data.Type) === 0){ // TYPE == 0 updates player count
@@ -81,8 +88,12 @@ class Main extends React.Component{
     }
     else if(parseInt(data.Type) === 2){ //TYPE == 2  has matched two players and will connect them
       const id = ""
-      this.createGameSocket(id);
+      // this.createGameSocket(id);
     }
+  }
+
+  handleGameResponse(rsp){
+
   }
 
   setServerStatus(online){
@@ -135,10 +146,16 @@ class Main extends React.Component{
             </IonCol>
             <IonCol>
               <Route path = "/" exact component = {MainOptions} />
+
               <Route path = "/online" exact component = {Online}/>
+
               <Route path = "/online/gamerooms" exact component = {GameRooms}/>
-              <Route path = "/online/customgame/" exact />
+
+              <Route path = "/online/customgame/" exact
+              render = {() => <CreateGame local_id = {this.state.id} />} />
+
               <Route path = "/online/customgame/{id}" exact />
+
               <Route path = "/online/public" exact
                   render = {() => <PublicQueue socket = {this.state.socket}
                   pid = {this.state.id} queueSize = {this.state.public_queue}/>}/>

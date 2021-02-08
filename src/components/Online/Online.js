@@ -97,6 +97,7 @@ class Online extends React.Component{
         </IonCard>
         </Link>
 
+        <Link to = {"/online/customgame"} style = {{textDecoration: "none"}}>
         <IonCard style = {{cursor: "pointer"}}>
             <IonItem>
               <IonIcon slot = "start" icon = {bulbOutline}/>
@@ -115,6 +116,7 @@ class Online extends React.Component{
             </IonCardContent>
             */}
         </IonCard>
+        </Link>
 
         <IonCard style = {{cursor: "pointer"}}>
             <IonItem>

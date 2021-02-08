@@ -1,5 +1,5 @@
 import React from "react";
-import {Link} from "react-router-dom";
+import {Link, Redirect} from "react-router-dom";
 import {joinQueue} from "../../api";
 import Loader from "../Loader";
 /* Core CSS required for Ionic components to work properly */
@@ -36,19 +36,12 @@ class RankedQueue extends React.Component{
   }
 
   componentDidMount(){
-    // set up canvas,
-    //register in queue
-    if(this.socket === undefined || !this.socket){
-      alert("Something went wrong on your end with connection to server")
-      return;
-    }
-    if(this.state.pid){
+
+    if(this.state.pid && this.socket){
       joinQueue(this.socket, this.qid, this.state.pid);
       console.log("registering in public queue");
     }
-    else{
-      alert("Something went wrong with server identification.")
-    }
+
 
   }
 
@@ -61,6 +54,11 @@ class RankedQueue extends React.Component{
 
 
   render(){
+    if(!this.state.pid || !this.socket){
+      return (
+        <Redirect to = {"/online"} />
+      )
+    }
     const players_in_queue = this.props.queueSize;
 
     return(
@@ -72,7 +70,7 @@ class RankedQueue extends React.Component{
           </Link>
           <IonTitle> Ranked Queue </IonTitle>
         </IonItem>
-        <Loader color = "rgb(0,0,255)"/>
+        <Loader color = "rgb(255,0,0)"/>
         <div style = {{display: "flex", justifyContent: "center", marginTop: "5%"}}>
           <IonLabel> Other Players in Queue: {players_in_queue}</IonLabel>
         </div>

@@ -1,5 +1,8 @@
 import React from "react";
 import {Link} from "react-router-dom";
+import Loader from "../Loader";
+import GameInfo from "../GameInfo";
+import {fetchGameRooms} from "../../api"
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/react/css/core.css';
 
@@ -24,12 +27,26 @@ class GameRooms extends React.Component{
   constructor(props){
     super(props);
     this.state = {
-
+      loaded: false,
+      data: [],
     }
   }
 
-  render(){
+  componentDidMount(){
+    fetchGameRooms((data) => this.onFetchGameRooms(data));
+  }
 
+  onFetchGameRooms(data){
+    console.log("data from game list", data)
+    this.setState({data: data, loaded:true})
+  }
+
+
+
+  render(){
+    const content = !this.state.loaded? <Loader color = "rgb(0, 255,0)"/>: this.state.data !== null?
+      this.state.data.map((data, index) => <GameInfo key = {index} data = {data}/ >):
+      <div style = {{display: "flex", justifyContent: "center"}}><IonLabel style = {{marginTop: "5%"}}> No Public Games Available </IonLabel> </div>
     return(
       <IonContent style = {{cursor: "default"}}>
         <IonItem >
@@ -48,6 +65,7 @@ class GameRooms extends React.Component{
             GameRooms
           </IonTitle>
         </IonItem>
+        {content}
       </IonContent>
     )
   }
