@@ -2,8 +2,7 @@ import React from "react";
 import {Tab, Tabs, TabList, TabPanel} from "react-tabs";
 import Chat from "../Chat";
 import MoveLog from "../MoveLog";
-
-
+import {Redirect} from "react-router-dom";
 import 'react-tabs/style/react-tabs.css';
 import "./GameTabs.css";
 
@@ -13,12 +12,30 @@ class GameTabs extends React.Component{
     this.state = {
 
     }
+    this.main = this.props.main;
+    this.gid = this.props.match.params.gid;
+  }
+
+  componentDidMount(){
+    if(!this.gid){
+      alert("Malformed game id");
+    }
+    else{
+      this.main.createGameSocket(this.gid);
+    }
+
+
   }
 
   render(){
+    if(!this.gid){
+      return (
+        <Redirect to = {"/"}/>
+      )
+    }
     return(
       <div className = "gameTabs">
-        <Tabs forceRenderTabPanel= {false}>
+        <Tabs>
           <TabList>
             <Tab> Chat </Tab>
             <Tab> Log </Tab>
@@ -26,10 +43,10 @@ class GameTabs extends React.Component{
           </TabList>
 
           <TabPanel>
-            <Chat/>
+            <h2> Chat </h2>
           </TabPanel>
           <TabPanel>
-            <MoveLog/>
+            <h2> Move Log</h2>
           </TabPanel>
           <TabPanel>
             <h2> Nothing here atm! </h2>

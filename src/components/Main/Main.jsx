@@ -9,6 +9,7 @@ import Scenarios from "../Scenarios";
 import RankedQueue from "../RankedQueue";
 import PublicQueue from "../PublicQueue";
 import CreateGame from "../CreateGame";
+import GameTabs from "../GameTabs";
 import User from "../User";
 import {BACKEND_URL} from "../../api";
 
@@ -69,10 +70,9 @@ class Main extends React.Component{
   /**
   @param id the user id trying to connect to game
   **/
-  createGameSocket(id){
-    const gid = uuidv4();
+  createGameSocket(gid){
     console.log("Game id", gid);
-    var gameSocket = new WebSocket(BACKEND_URL + "/game/" + gid+ "/"+ id);
+    var gameSocket = new WebSocket(BACKEND_URL + "/game/" + gid+ "/"+ this.state.id);
     this.setState({gameSocket: gameSocket});
     connectGame(gameSocket, (rsp) => {this.handleGameResponse(rsp)});
   }
@@ -81,7 +81,6 @@ class Main extends React.Component{
     const data = JSON.parse(rsp.data);
     console.log(data)
     if(parseInt(data.Type) === 0){ // TYPE == 0 updates player count
-      console.log(data.players);
       this.setState({players_online: data.players})
     }
     else if(parseInt(data.Type) === 1){ // TYPE == 1 updates queue lengths;
@@ -95,10 +94,14 @@ class Main extends React.Component{
 
   handleGameResponse(rsp){
     const data = JSON.parse(rsp.data);
-    console.log("game data", data);
-    if(parseInt(data.Type) === 0){ //player connected
-
-    } else if (parseInt(data.Type) === 1){ //board update
+    console.log("parsed game data", data);
+    if(parseInt(data.type) === 0){ //player connected and match starts
+        console.log("Opponent connected", data.pid)
+        this.setState({other_player: true,
+          other_player_name: "Guest - " + data.pid, other_player_icon: personCircleOutline})
+        this.chess.current.ResetBoard();
+        this.chess.current.setState({player:parseInt(data.color), flipped: parseInt(data.color) === BLACK})
+      } else if(parseInt(data.type) === 1){ //board update
 
       //1. update board
       //parseBoardData
@@ -107,8 +110,14 @@ class Main extends React.Component{
       //2. update move log
       //send string representation of move to move log
 
-    } else if (parseInt(data.Type) === 2){ // chat update
-      //send string update to chat 
+    } else if (parseInt(data.type) === 2){ // chat update
+      //send string update to chat
+    }
+    else if (parseInt(data.type) === 3){ //player leave
+
+    }
+    else if(parseInt(data.type) === 4){ // spectator/join
+
     }
   }
 
@@ -174,7 +183,6 @@ class Main extends React.Component{
               <Route path = "/online/customgame/" exact
               render = {() => <CreateGame local_id = {this.state.id} />} />
 
-              <Route path = "/online/customgame/{id}" exact />
 
               <Route path = "/online/public" exact
                   render = {() => <PublicQueue socket = {this.state.socket}
@@ -183,12 +191,13 @@ class Main extends React.Component{
               <Route path = "/online/ranked" exact
                   render = {() => <RankedQueue socket = {this.state.socket}
                   pid = {this.state.id} queueSize = {this.state.ranked_queue}/> }/>
-              <Route path = "/online/ranked/{id}" exact />
               <Route path = "/ai" exact component = {AIOutline} />
-              <Route path = "/ai/{id}" exact />
               <Route path = "/scenario" exact component = {Scenarios}/>
-              <Route path = "/scenario/{id}" exact />
 
+
+              <Route path = "/game/:gid" render = {(routeProps)=>
+                (<GameTabs {...routeProps} main = {this} />)}
+               />
             </IonCol>
 
           </IonRow>

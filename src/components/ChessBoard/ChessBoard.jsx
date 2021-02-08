@@ -61,6 +61,11 @@ class ChessBoard extends React.Component{
     window.requestAnimationFrame(() => this.animate());
   }
 
+  ResetBoard(){
+    const board = new QuantumBoard(this.props.scenario, this.props.fullBoard);
+    this.setState({board:board})
+  }
+
 
   animate(){
     this.drawBoard(this.state.board, this.state.flipped);

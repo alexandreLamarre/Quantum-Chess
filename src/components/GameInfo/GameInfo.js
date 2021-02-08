@@ -1,5 +1,5 @@
 import React from "react";
-
+import {Link} from "react-router-dom"
 import '@ionic/react/css/core.css';
 /* Basic CSS for apps built with Ionic */
 import '@ionic/react/css/normalize.css';
@@ -21,9 +21,11 @@ import { IonItem, IonLabel, IonCard} from "@ionic/react";
 
    render(){
      return (
+       <Link to = {"/game/" + this.props.data} style = {{textDecoration: "None"}}>
        <IonItem>
           <IonLabel> {"Game-" + this.props.data} </IonLabel>
        </IonItem>
+       </Link>
      )
    }
  }
