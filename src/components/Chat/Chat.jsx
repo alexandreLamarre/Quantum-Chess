@@ -11,21 +11,23 @@ class Chat extends React.Component{
     this.state = {
       chatHistory: []
     }
+    this.main = this.props.main;
+    this.socket = this.props.socket;
+    this.pid = this.props.pid;
   }
 
   componentDidMount(){
-    connect((msg) => {
-      console.log("New Message")
-      this.setState(prevState => ({
-        chatHistory: [...this.state.chatHistory, msg]
-      }));
-      console.log(this.state);
-    })
+    console.log("chat socket:",  this.main.state.gameSocket)
   }
 
   send(event){
     if(event.keyCode === 13){
-      sendMsg(event.target.value);
+      if(this.main.state.gameSocket === undefined){
+        alert("gameSocket expired --- unable to send message");
+        return;
+      }
+
+      sendMsg(this.main.state.gameSocket, {pid: this.main.state.id, message: event.target.value, type: 2});
       event.target.value = "";
     }
   }
@@ -34,8 +36,8 @@ class Chat extends React.Component{
     return  (
       <div>
         <Header name = {"Messages"}/>
-        <ChatHistory history={this.state.chatHistory} />
-        <ChatInput send = {this.send}/>
+        <ChatHistory pid = {this.main.state.id} history={this.main.state.chatHistory} />
+        <ChatInput send = {(e) => this.send(e)}/>
       </div>
     );
   }

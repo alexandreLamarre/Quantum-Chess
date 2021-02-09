@@ -39,7 +39,8 @@ let joinQueue = (socket,qid,pid) => {
 
 let sendMsg = (socket,msg) =>{
   console.log("sending msg:", msg);
-  socket.send(msg);
+  const message = JSON.stringify(msg);
+  socket.send(message);
 };
 
 

@@ -1,17 +1,21 @@
 import React from "react";
 import "./Message.css";
 
+import {IonChip, IonIcon, IonLabel} from "@ionic/react";
+import {personCircleOutline} from "ionicons/icons";
+
 class Message extends React.Component{
   constructor(props){
     super(props);
-    let temp = JSON.parse(this.props.message);
-    this.state = {
-      message: temp
-    };
   }
 
   render(){
-    return <div className = "Message"> {this.state.message.body} </div>
+    return (
+      <IonChip outline = "true" style = {{pointerEvents: "none"}}
+      color = {this.props.color? "tertiary":""}> <IonIcon icon = {personCircleOutline}/>
+    <IonLabel> {this.props.pid + "  :  " + this.props.message} </IonLabel>
+    </IonChip>
+  )
   }
 }
 

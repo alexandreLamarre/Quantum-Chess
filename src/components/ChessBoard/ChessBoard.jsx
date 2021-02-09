@@ -35,7 +35,9 @@ class ChessBoard extends React.Component{
     console.time("stringify")
     const x = board.toJSON();
     console.timeEnd("stringify")
+    console.log("length of board JSON", JSON.stringify(x).length)
     console.log("board to JSON", x);
+    console.log(JSON.stringify(x))
     const incheck_state = board.inCheck(this.state.player);
     const in_check_highlighted = [];
     in_check_highlighted.push(...incheck_state.ally_squares);
@@ -144,7 +146,8 @@ class ChessBoard extends React.Component{
     if(check_outcomes.ally) {
       var player = cur_player === BLACK? "White": "BLACK";
       var message = `${player} has won!`;
-      //alert(message)
+      //open modal
+      alert(message)
     }
     //this.setState()
     this.state.board.nextPlayer();

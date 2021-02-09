@@ -1,16 +1,17 @@
 import React from "react";
-import {Tab, Tabs, TabList, TabPanel} from "react-tabs";
 import Chat from "../Chat";
 import MoveLog from "../MoveLog";
 import {Redirect} from "react-router-dom";
-import 'react-tabs/style/react-tabs.css';
+
 import "./GameTabs.css";
+import {IonItem, IonIcon, IonContent} from "@ionic/react";
+import {chatboxOutline, optionsOutline, bookOutline, flagOutline} from "ionicons/icons";
 
 class GameTabs extends React.Component{
   constructor(props){
     super(props)
     this.state = {
-
+      tab: "chat",
     }
     this.main = this.props.main;
     this.gid = this.props.match.params.gid;
@@ -23,8 +24,6 @@ class GameTabs extends React.Component{
     else{
       this.main.createGameSocket(this.gid);
     }
-
-
   }
 
   render(){
@@ -34,25 +33,42 @@ class GameTabs extends React.Component{
       )
     }
     return(
-      <div className = "gameTabs">
-        <Tabs>
-          <TabList>
-            <Tab> Chat </Tab>
-            <Tab> Log </Tab>
-            <Tab> Settings</Tab>
-          </TabList>
+      <IonContent>
 
-          <TabPanel>
-            <h2> Chat </h2>
-          </TabPanel>
-          <TabPanel>
-            <h2> Move Log</h2>
-          </TabPanel>
-          <TabPanel>
-            <h2> Nothing here atm! </h2>
-          </TabPanel>
-        </Tabs>
-      </div>
+          <div style = {{display: "flex", justifyContent: "space-evenly", outline: "1px solid rgba(73,73,73,0.5)"}}>
+          <IonItem lines = "none">
+            <IonIcon slot = "end" icon = {chatboxOutline}
+            style = {{cursor: "pointer", color: this.state.tab === "chat"? "green":"black"}}
+            onClick = {() => this.setState({tab:"chat"})}/>
+          </IonItem>
+          <IonItem lines = "none" >
+            <IonIcon slot = "end" icon = {bookOutline}
+            style = {{cursor: "pointer", color: this.state.tab === "log"? "green": "black"}}
+            onClick = {() => this.setState({tab: "log"})}/>
+          </IonItem>
+          <IonItem lines = "none">
+            <IonIcon slot = "end" icon = {optionsOutline}
+            style = {{cursor: "pointer", color: this.state.tab === "settings"? "green": "black"}}
+            onClick = {() => this.setState({tab:"settings"})} />
+          </IonItem>
+          <IonItem lines = "none">
+            <IonIcon slot = "end" icon = {flagOutline} style = {{cursor: "pointer"}} />
+          </IonItem>
+          </div>
+
+          <div hidden = {this.state.tab !== "chat"}>
+            <Chat pid = {this.props.pid} main = {this.main} pid = {this.main.state.id}/>
+          </div>
+
+          <div hidden = {this.state.tab !== "log"}>
+            <h2> Log </h2>
+          </div>
+
+          <div hidden = {this.state.tab !== "settings"}>
+            <h2> Settings </h2>
+          </div>
+
+      </IonContent>
     )
   }
 }

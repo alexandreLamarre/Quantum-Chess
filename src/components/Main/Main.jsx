@@ -53,6 +53,7 @@ class Main extends React.Component{
       other_player: null,
       other_player_name: null,
       other_player_icon: null,
+      chatHistory: [],
     }
     this.chess = React.createRef();
   }
@@ -112,6 +113,11 @@ class Main extends React.Component{
 
     } else if (parseInt(data.type) === 2){ // chat update
       //send string update to chat
+      const pid = data.pid;
+      const content = data.message;
+      this.setState(prevState => ({
+        chatHistory: [...this.state.chatHistory, {pid: data.pid, message:content}]
+      }));
     }
     else if (parseInt(data.type) === 3){ //player leave
 
@@ -199,6 +205,7 @@ class Main extends React.Component{
                 (<GameTabs {...routeProps} main = {this} />)}
                />
             </IonCol>
+
 
           </IonRow>
           <IonRow>

@@ -8,23 +8,17 @@ class ChatHistory extends React.Component{
     this.state = {
       height:0,
     }
+    console.log("CHAT HISTORY PID", this.props.pid)
   }
 
-  componentDidMount(){
-    this.setState({height:window.innerHeight*0.65})
-    window.addEventListener("resize", ()=> this.onResize())
-  }
-
-  onResize(){
-    this.setState({height:window.innerHeight*0.65})
-  }
   render(){
     const messages = this.props.history.map((msg, index) =>
-      <Message message = {msg.data}/>
+      <Message key = {index} message = {msg.message} pid = {msg.pid}
+      color = {this.props.pid === msg.pid?false: true}/>
     );
 
     return(
-      <div className = "ChatHistory" style = {{maxHeight: this.state.height}}>
+      <div className = "ChatHistory" style = {{display:"flex", flexDirection:"column"}}>
         {messages}
       </div>
     )

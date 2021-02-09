@@ -6,7 +6,7 @@ class ChatInput extends React.Component{
   render(){
     return(
       <div className = "ChatInput">
-        <input onKeyDown = {this.props.send} />
+        <input onKeyDown = {(e) =>this.props.send(e)} />
       </div>
     );
   }
