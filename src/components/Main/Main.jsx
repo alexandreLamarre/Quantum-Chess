@@ -54,6 +54,9 @@ class Main extends React.Component{
       other_player_name: null,
       other_player_icon: null,
       chatHistory: [],
+      highlight: true,
+      highlight_check:true,
+      
     }
     this.chess = React.createRef();
   }
@@ -101,7 +104,11 @@ class Main extends React.Component{
         this.setState({other_player: true,
           other_player_name: "Guest - " + data.pid, other_player_icon: personCircleOutline})
         this.chess.current.ResetBoard();
-        this.chess.current.setState({player:parseInt(data.color), flipped: parseInt(data.color) === BLACK})
+        this.chess.current.setState({interacteable: true,
+                                    player:parseInt(data.color),
+                                    flipped: parseInt(data.color) === BLACK})
+
+
       } else if(parseInt(data.type) === 1){ //board update
 
       //1. update board
@@ -177,7 +184,7 @@ class Main extends React.Component{
             {/*ACTIVE = TRUE only for testing, otherwise undefined, or better yet, false. */}
               <ChessBoard ref = {this.chess}
               main = {this} player = {this.state.player}
-              fullBoard = {true} active = {true} highlight = {true}/>
+              fullBoard = {true}/>
             </IonCol>
             <IonCol>
               <Route path = "/" exact component = {MainOptions} />

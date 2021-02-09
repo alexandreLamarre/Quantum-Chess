@@ -20,10 +20,12 @@ import { IonItem, IonLabel, IonCard} from "@ionic/react";
  class GameInfo extends React.Component{
 
    render(){
+     console.log(this.props.data);
      return (
-       <Link to = {"/game/" + this.props.data} style = {{textDecoration: "None"}}>
+       <Link to = {"/game/" + this.props.data.id} style = {{textDecoration: "None"}}>
        <IonItem>
-          <IonLabel> {"Game-" + this.props.data} </IonLabel>
+          <IonLabel> {"Game-" + this.props.data.id} </IonLabel>
+          <IonLabel> {"Players: " + this.props.data.count + "/2"}</IonLabel>
        </IonItem>
        </Link>
      )

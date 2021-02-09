@@ -1,6 +1,7 @@
 import React from "react";
 import Chat from "../Chat";
 import MoveLog from "../MoveLog";
+import Settings from "../Settings";
 import {Redirect} from "react-router-dom";
 
 import "./GameTabs.css";
@@ -61,11 +62,11 @@ class GameTabs extends React.Component{
           </div>
 
           <div hidden = {this.state.tab !== "log"}>
-            <h2> Log </h2>
+            <MoveLog />
           </div>
 
           <div hidden = {this.state.tab !== "settings"}>
-            <h2> Settings </h2>
+            <Settings />
           </div>
 
       </IonContent>

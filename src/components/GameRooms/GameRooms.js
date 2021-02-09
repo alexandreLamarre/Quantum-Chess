@@ -33,18 +33,29 @@ class GameRooms extends React.Component{
   }
 
   componentDidMount(){
+
     fetchGameRooms((data) => this.onFetchGameRooms(data));
   }
 
   onFetchGameRooms(data){
-    console.log("data from game list", data)
-    this.setState({data: data, loaded:true})
+    this.setState({loaded: true});
+    if(data === null) return;
+    const games = data.Ids;
+    const player_count = data.Players;
+    const parsed_data = [];
+    if(games === null) return;
+    if(player_count === null) return;
+    for(let i = 0; i < games.length; i++){
+      parsed_data.push({id:games[i], count: player_count[i]})
+    }
+    console.log("data from game list", parsed_data)
+    this.setState({data: parsed_data})
   }
 
 
 
   render(){
-    const content = !this.state.loaded? <Loader color = "rgb(0, 255,0)"/>: this.state.data !== null?
+    const content = !this.state.loaded? <Loader color = "rgb(0, 255,0)"/>: this.state.data !== []?
       this.state.data.map((data, index) => <GameInfo key = {index} data = {data}/ >):
       <div style = {{display: "flex", justifyContent: "center"}}><IonLabel style = {{marginTop: "5%"}}> No Public Games Available </IonLabel> </div>
     return(

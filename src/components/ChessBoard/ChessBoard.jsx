@@ -6,12 +6,16 @@ var FLIPPED = true;
 
 const WHITE = 0;
 const BLACK = 1;
+const VISUALLY_DISTINCT = ["#a52a2a", "#006400", "#b8860b", "#ff0000", "ffff00",
+"00ff00", "#00ffff", "0000ff", "ff00ff", "#1e90ff", "#98fb98", "#ffdab9", "#ffa500",
+"#bdb76b", "#191970", "#afeeee"]
+
 
 class ChessBoard extends React.Component{
   constructor(props){
     super(props);
     this.state = {
-      interacteable: this.props.active,
+      interacteable: false,
       size: 0,
       board: [],
       highlighted: [],
@@ -123,8 +127,8 @@ class ChessBoard extends React.Component{
           ctx.closePath();
         }
       }
-      this.drawInCheck(ctx, SIZE, flipped);
-      if(this.props.highlight) this.drawLegal(ctx, SIZE, flipped);
+      if(this.main.state.highlight_check)this.drawInCheck(ctx, SIZE, flipped);
+      if(this.main.state.highlight) this.drawLegal(ctx, SIZE, flipped);
       this.drawPieces(ctx, board, SIZE, flipped);
   }
 
@@ -340,7 +344,7 @@ class ChessBoard extends React.Component{
   }
 
   setDrag(e,v){
-    if(e.button === 0 && !this.state.awaitingResponse){
+    if(e.button === 0 && !this.state.awaitingResponse && this.state.interacteable){
       if(v && this.state.board.player === this.state.player){
         const [highlighted, id, x, y] = this.updateHighlighted(e)
         console.log(highlighted, id, x, y);
