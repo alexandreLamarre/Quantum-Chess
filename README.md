@@ -17,25 +17,27 @@ For those unfamiliar with Quantum mechanics, a brief overview is given in Quantu
 
 #### Rules pertaining to the nature & movement of Q-pieces
 
-- **Rule 1.1** Each Q-piece has a **state space**, **initial state** and **quantum gate(or action)** associated with it:
+- **Rule 1.1** Each Q-piece is initially in its own quantum system, which means it is not entangled with any other pieces.
+
+- **Rule 1.2** Each Q-piece has a **state space**, **initial state** and **quantum gate(or action)** associated with it:
 
 
 
 |Q-piece| State Space | Initial State | Quantum gate/action | Gate/action description | Symbol |
 | :---: | :---------: | :-----------: | :-----------------: | :-----------------------------: | :---: |
-| Q-pawn |\{Pawn, The piece starting behind it\}| 1.0 Pawn 0.0 Other piece | **Pauli Z**| Quantum phase shift: | a |
-| Q-queen | \{Queen, Pawn\} | 1/sqrt(2) Queen 1/sqrt(2) Pawn | **Hadamard gate** | a | a|
+| Q-pawn |\{Pawn, The piece starting behind it\}| 1.0 Pawn 0.0 Other piece | **Pauli Z**| Quantum phase shift: Essentially does nothing to affect the measurement probability outcomes | a |
+| Q-queen | \{Queen, Pawn\} | 1/sqrt(2) Queen 1/sqrt(2) Pawn | **Hadamard gate** | "Normalizes" quantum states, in particular takes determined states to evenly probable quantum states | a|
 | Q-king | \{King\} | 1.0 King | None, just a regular chess king | None | a|
-| Q-rook | \{Rook, Pawn\} | 1/sqrt(2) Rook /sqrt(2) Pawn | **Measurement**| Performs the measurement action on a quantum system| a |
-| Q-bishop | \{Bishop, Pawn\} | 1/sqrt(2) Bishop 1/sqrt(2) Pawn | **Pauli Y** | a |  a|
+| Q-rook | \{Rook, Pawn\} | 1/sqrt(2) Rook /sqrt(2) Pawn | **Measurement**| Performs the measurement action on a quantum system | a |
+| Q-bishop | \{Bishop, Pawn\} | 1/sqrt(2) Bishop 1/sqrt(2) Pawn | **Hadamard** |  "Normalizes" quantum states, in particular takes determined states to evenly probable quantum states |  a|
 | Q- knight | \{Kinght, pawn} | 1/sqrt(2) Kinght 1/sqrt(2) Pawn | **Pauli X** | controlled NOT gate, "swaps" the probability of quantum states|a |
 
 
 
-- **Rule 1.2 ** Q-pieces in a mixed state can move in terms of either piece in their state space
+- **Rule 1.3** Q-pieces in a mixed state can move in terms of either piece in their state space
   - Example: A Q-rook in a mixed state can move as a rook or pawn
 
-- **Rule 1.3** Q-pieces in a determined state, i.e. where one of the states = 1.0 and the other 0.0, can only move as the piece whose state they are in.
+- **Rule 1.4** Q-pieces in a determined state, i.e. where one of the states = 1.0 and the other 0.0, can only move as the piece whose state they are in.
   - Example: A Q-queen with state (0.0 Queen, 1.0 Pawn) can **ONLY** move as a **PAWN**.
 
  #### Rules pertaining to Quantum entanglement & action of Q-pieces
@@ -44,7 +46,9 @@ For those unfamiliar with Quantum mechanics, a brief overview is given in Quantu
 
   TODO: ADD EXAMPLE PICTURES
 
-- **Rule 2.2** The order of events every turn are move ---(if captures)----> capture --- (else if in a mixed state) ---> influence -> entanglement -> quantum circuit/action.
+- **Rule 2.2** Here is the flowchart for turn chronology:
+
+    - TODO ADD FLOW CHART
 
 - **Rule 2.3** The area of influence, entaglement and quantum circuit/action only apply on the turn the piece is moved.
   - E.g. if a Q-piece moves within a Q-queen's diagonal on a subsequent turn, it does not become entagled with the Q-queen due to Q-queen's area of influence. It only becomes entangled with the Q-queen if Q-queen is within the moved piece's own area of influence.
@@ -55,20 +59,23 @@ For those unfamiliar with Quantum mechanics, a brief overview is given in Quantu
 
 - **Rule 3.1** A Q-piece's state is determined when it performs a capture or is captured itself. (Following the rules of quantum mechanics, entangled Q-pieces with the Q-piece that perform the capture or the Q-piece that is captured are also measured). A Q-piece's state can also be measured within a Q-rook's **area of influence** on the turn it is moved.
 
-- **Rule 3.2** An entangled state of 8 or more pieces collapses, as if due to instability, and becomes measured. It collapses before any quantum circuit can be applied. (The real reason this rule is implemented is due to **hardware limitations**)
+- **Rule 3.2** An entangled state of 8 or more pieces collapses, as if due to instability, and becomes measured. It collapses before any quantum circuit can be applied. (The reason this rule is implemented is due to **hardware limitations** and **information transfer speed limitations**)
 
 #### Miscelanious Rules
 
-- **Rule 4.1** Castling is a legal move in quantum chess and the rules of area of influence, entaglement and quantum circuits apply to the Q-rook the king castles with.
+- **Rule 4.1** Castling is not a legal move.
 
-- **Rule 4.2** Any piece that reaches the end of the board that has a non-zero state of "Pawn" becomes a Q-queen in its initial state. 
+- **Rule 4.2** Any Q-pawn piece that reaches the end of the board that has a non-zero state of "Pawn" becomes a Q-queen in its initial state. 
 Chronologically, this event happens after a capture if it occured, so the piece only becomes a Q-queen if it is measured as a pawn. If the piece is in an entangled state when it arrives at the end of the board, the entangled state collapses and all pieces within it are measured, except the piece that was moved if it had a possibility of being a pawn -- instead it becomes a Q-queen. 
 
 #### Rules pertaining to winning
 
-- **Rule 5.1** The game ends when a player has only one remaining determined state king, that is checkmated. The player whose remaining king is checkmated loses while the other wins.
+**There is no checkmate in Quantum Chess**, since there are too many probabilistic ways to end up in check and checkmate.
 
-- **Rule 5.2** The game ends when a player has only one remaining determined state king that is flipped back to a mixed state. The player whose remaining determined state king was flipped to a mixed state loses, while the other wins.
+- **Rule 5.1** Instead winning and losing is determined after pieces have moved, circuits evaluated, measured, etc..., but before the next player's turn. If one of the player's
+**determined state King** (A Q-piece that has current state King: 1.0) is in check when his or turn is about to end they lose the game.
+
+- **Rule 5.2** Alternatively, the game can also end when a player has only one remaining determined state king that is flipped back to a mixed state. The player whose remaining determined state king was flipped to a mixed state loses, while the other wins.
 
 ### Refereces
 - Nielsen, Michael A., and Isaac Chuang. "Quantum computation and quantum information." (2002): 558-559.
