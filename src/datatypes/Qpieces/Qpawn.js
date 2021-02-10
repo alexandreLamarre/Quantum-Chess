@@ -13,15 +13,17 @@ class Qpawn extends Qpiece{
   @param piece the string representing the piece that starts behind it
   **/
   constructor(piece, color){
-    const s = new Set(["Pawn", piece]);
+    const s = ["Pawn", piece];
+    var secondary_model;
     // let model = new Image();
-    // if(piece === "Bishop" && color === WHITE) model.src = QWPAWN_BISHOP;
-    // if(piece === "King" && color === WHITE) model.src = QWPAWN_KING;
-    // if(piece === "Knight" && color === WHITE) model.src = QWPAWN_KNIGHT;
-    // if(piece === "Queen" && color === WHITE) model.src = QWPAWN_QUEEN;
-    // if(piece === "Rook" && color === WHITE) model.src = QWPAWN_ROOK;
+    if(piece === "Bishop") secondary_model = "\u{265D}";
+    if(piece === "King") secondary_model = "\u{265A}";
+    if(piece === "Knight") secondary_model = "\u{265E}";
+    if(piece === "Queen") secondary_model = "\u{265B}";
+    if(piece === "Rook") secondary_model = "\u{265C}";
       const model = "\u{265F}";
-    super(s, [1.0, 0.0], "PauliZ", color, model);
+
+    super(s, [1.0, 0.0], "PauliZ", color, model, secondary_model);
   }
 }
 

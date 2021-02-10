@@ -15,7 +15,7 @@ class ChessBoard extends React.Component{
   constructor(props){
     super(props);
     this.state = {
-      interacteable: false,
+      interacteable: true,
       size: 0,
       board: [],
       highlighted: [],
@@ -28,6 +28,11 @@ class ChessBoard extends React.Component{
       dragging:false,
       awaitingResponse: false,
       player: WHITE,
+      userMarkedTiles: new Set(),
+      userMarkedArrows: [],
+      startArrow: null,
+      currentArrow: null,
+      arrows: new Set(),
     }
     this.canvas = React.createRef();
     this.main = this.props.main;
@@ -52,6 +57,7 @@ class ChessBoard extends React.Component{
     const h = Math.floor(window.innerHeight);
     var size = Math.min(w,h)*0.90;
     const canvas = this.canvas.current;
+    canvas.oncontextmenu = function(e){e.preventDefault(); e.stopPropagation();}
     size = Math.max(200, size);
     size = Math.min(550, size);
     canvas.width = size;
@@ -128,7 +134,11 @@ class ChessBoard extends React.Component{
         }
       }
       if(this.main.state.highlight_check)this.drawInCheck(ctx, SIZE, flipped);
+      if(this.main.state.mark) this.drawMarked(ctx, SIZE, flipped);
       if(this.main.state.highlight) this.drawLegal(ctx, SIZE, flipped);
+      if(this.main.state.mark) this.drawMarked(ctx, SIZE, flipped);
+      if(this.main.state.drawArrow) this.drawArrows(ctx, SIZE, flipped);
+      if(this.main.state.drawArrow) this.drawCurrentArrow(ctx, SIZE, flipped);
       this.drawPieces(ctx, board, SIZE, flipped);
   }
 
@@ -177,6 +187,70 @@ class ChessBoard extends React.Component{
       ctx.fill();
       ctx.closePath();
     }
+  }
+
+  drawMarked(ctx, size, flipped){
+    var constant = 0;
+    var d = -1;
+    if(flipped){
+      constant = size*7;
+      d = 1;
+    }
+
+    const marked = this.state.userMarkedTiles;
+    marked.forEach((tile) => {
+      ctx.beginPath();
+      ctx.fillStyle = "rgba(255,255,0,0.5)";
+      const x = tile%8;
+      const y = Math.floor(tile/8)
+
+      ctx.fillRect(constant - d*x*size, constant - d*y*size, size, size);
+      ctx.fill();
+      ctx.closePath();
+    });
+  }
+
+  drawCurrentArrow(ctx, size, flipped){
+    var constant = 0;
+    var d = -1;
+    if(flipped){
+      constant = size*7;
+      d = 1;
+    }
+
+    const elems = [this.state.startArrow, this.state.currentArrow];
+    if(elems[0] === null || elems[1] === null || elems[0] === elems[1] ) return;
+    var startX = elems[0]%8;
+    var startY = Math.floor(elems[0]/8)
+    var endX = elems[1]%8;
+    var endY = Math.floor(elems[1]/8);
+    startX = constant - d*(startX*size + size/2);
+    startY = constant -d*(startY*size + size/2);
+    endX = constant - d*(endX*size + size/2);
+    endY = constant - d*(endY*size + size/2);
+    drawArrow(ctx, startX, startY, endX, endY)
+  }
+
+  drawArrows(ctx, size, flipped){
+    var constant = 0;
+    var d = -1;
+    if(flipped){
+      constant = size*7;
+      d = 1;
+    }
+
+    const arrows = this.state.arrows;
+    arrows.forEach((elems) => {
+      var startX = elems[0]%8;
+      var startY = Math.floor(elems[0]/8)
+      var endX = elems[1]%8;
+      var endY = Math.floor(elems[1]/8);
+      startX = constant - d*(startX*size + size/2);
+      startY = constant -d*(startY*size + size/2);
+      endX = constant - d*(endX*size + size/2);
+      endY = constant - d*(endY*size + size/2);
+      drawArrow(ctx, startX, startY, endX, endY)
+    });
   }
 
   drawInCheck(ctx, size, flipped){
@@ -240,29 +314,7 @@ class ChessBoard extends React.Component{
   }
 
   drawPieceText(ctx, piece, size, x, y, flipped){
-    var constantX = 0;
-    var constantY = 0;
-    var d = -1;
-    if(flipped){
-      constantX = size*7
-      constantY = size*9;
-      d = +1;
-    }
-
-    const unicode = piece.model;
-    const color = piece.color === WHITE? "rgb(255,255,255)": "rgb(0,0,0)";
-    ctx.beginPath();
-    ctx.fillStyle = color;
-    ctx.font = (size*9/10).toString() + "px serif";
-    ctx.fillText(unicode, constantX - d*x, constantY-d*(y)-size/10);
-    ctx.fill();
-    ctx.closePath();
-    ctx.beginPath();
-    ctx.strokeStyle = "rgb(0,0,0)";
-    ctx.font = (size*9/10).toString() + "px serif";
-    ctx.strokeText(unicode, constantX - d*x, constantY - d*(y)-size/10);
-    ctx.stroke();
-    ctx.closePath();
+    piece.drawPiece(ctx, size, x, y, flipped)
   }
 
   getMouseLocation(e){
@@ -291,7 +343,7 @@ class ChessBoard extends React.Component{
   showToolTip(e){
     const square = this.getSquare(e)
     const id = this.state.board.getID(square);
-    if(id !== null && this.state.hoverPiece === false){
+    if(id !== 0 && this.state.hoverPiece === false){
       const piece = this.state.board.pieces[id].parseTooltip();
       const [x,y] = this.getMouseLocation(e);
       this.setState({hoverPiece:true, toolTipx: x, toolTipy: y, tooltip: piece});
@@ -345,6 +397,11 @@ class ChessBoard extends React.Component{
 
   setDrag(e,v){
     if(e.button === 0 && !this.state.awaitingResponse && this.state.interacteable){
+      this.setState({
+        userMarkedTiles: new Set(),
+        arrows: new Set(),
+        startArrow: null,
+        currentArrow: null});
       if(v && this.state.board.player === this.state.player){
         const [highlighted, id, x, y] = this.updateHighlighted(e)
         console.log(highlighted, id, x, y);
@@ -361,6 +418,28 @@ class ChessBoard extends React.Component{
         this.setState({dragging: false, selectedPiece: null, highlighted: []})
       }
     }
+    if(e.button === 1 && !v){
+      const square = this.getSquare(e)
+      this.setState({userMarkedTiles: this.state.userMarkedTiles.add(square)})
+    }
+    if(e.button === 2 && v){
+      console.log("hello")
+      const square = this.getSquare(e)
+      this.setState({startArrow: square})
+    }
+    else if(e.button === 2 && !v){
+      if(this.state.arrow !== null){
+        console.log("goodbye")
+        const square = this.getSquare(e);
+        if(square != this.state.startArrow){
+          this.setState({
+            startArrow:null,
+            arrows: this.state.arrows.add([this.state.startArrow, square]),
+            currentArrow:null
+          });
+        }
+      }
+    }
   }
 
   handleMouseEventsOnCanvas(e){
@@ -368,6 +447,10 @@ class ChessBoard extends React.Component{
               && e.button === 0 && this.state.board.player === this.state.player){
       const [x,y] = this.getMouseLocation(e);
       this.setState({selectedX: x, selectedY: y})
+    }
+    if(this.state.startArrow !== null){
+      const square = this.getSquare(e)
+      this.setState({currentArrow: square});
     }
   }
 
@@ -384,6 +467,15 @@ class ChessBoard extends React.Component{
     // sendMsg()
   }
 
+  addToUserMarkedTiles(e){
+    e.preventDefault();
+    if(e.button === 2){
+      const square = this.getSquare(e);
+      console.log(this.state.userMarkedTiles)
+      this.setState({userMarkedTiles: [...this.state.userMarkedTiles, square]});
+    }
+  }
+
   render(){
     const moving = this.state.selectedPiece;
     return (
@@ -393,11 +485,10 @@ class ChessBoard extends React.Component{
                   outline: "1px solid black",
                   cursor: this.state.selectedPiece === null? "default": "grabbing"
                 }}
-        onMouseLeave = {(e) => this.setDrag(e, false)}
-        onMouseDown = {(e) => this.setDrag(e,true)}
+        onMouseDown = {(e) => this.setDrag(e,true, false)}
         onMouseMove = {(e) => this.handleMouseEventsOnCanvas(e)}
         onMouseUp = {(e) => {this.setDrag(e,false)}}
-        onClick = {(e) => {}}
+        onClick = {(e) => {this.addToUserMarkedTiles(e)}}
         className = "chessBoard"
         />
         <div className = "tooltip" hidden = {!this.state.hoverPiece}
@@ -411,3 +502,30 @@ class ChessBoard extends React.Component{
 }
 
 export default ChessBoard;
+
+
+function drawArrow(ctx, startX, startY, endX, endY){
+ var headlen = 10;
+ var dx = endX - startX;
+ var dy = endY - startY;
+ var angle = Math.atan2(dy, dx);
+
+ ctx.beginPath();
+ ctx.strokeStyle = "rgba(255, 165, 0, 0.7)";
+ ctx.lineWidth = 5;
+ ctx.moveTo(startX, startY);
+ ctx.lineTo(endX, endY);
+ ctx.stroke();
+ ctx.closePath();
+ ctx.beginPath();
+ ctx.moveTo(endX, endY);
+ ctx.lineTo(endX - headlen * Math.cos(angle - Math.PI / 7), endY - headlen * Math.sin(angle - Math.PI / 7));
+ ctx.lineTo(endX - headlen * Math.cos(angle + Math.PI / 7), endY - headlen * Math.sin(angle + Math.PI / 7));
+ ctx.lineTo(endX, endY);
+ ctx.lineTo(endX - headlen* Math.cos(angle - Math.PI/7), endY - headlen * Math.sin(angle-Math.PI /7));
+ ctx.stroke();
+ ctx.fillStyle = "rgba(255, 165, 0, 0.7)";
+ ctx.fill();
+ ctx.closePath();
+ ctx.lineWidth = 1;
+}

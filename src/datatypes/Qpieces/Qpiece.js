@@ -13,11 +13,12 @@ class Qpiece{
   @param action string describing action of Qpiece
   @param model image object for the qpiece
   **/
-  constructor(stateSpace, initialState, action, color, model){
+  constructor(stateSpace, initialState, action, color, model, secondary_model){
     this.color = color;
     this.stateSpace = stateSpace;
     this.action = action;
     this.model = model;
+    this.secondary_model = secondary_model;
     this.moved = false;
     if(!this.action) this.action = "None";
     if(!stateSpace) {
@@ -25,7 +26,7 @@ class Qpiece{
       console.log("invalid state space for Q-piece")
     }
 
-    if(!initialState || stateSpace.size !== initialState.length){
+    if(!initialState || stateSpace.length !== initialState.length){
       console.log("Invalid initial state for Q-piece")
       this.initialState = {};
       this.states = this.initialState;
@@ -40,7 +41,129 @@ class Qpiece{
 
   toJSON(){
     return {color: this.color, stateSpace: this.stateSpace, action: this.action,
-            initialState: this.initialState, states: this.states}
+            initialState: this.initialState, states: this.states, moved: this.moved}
+  }
+
+  drawPiece(ctx, size, x,y, flipped){
+    const [primaryActivated, secondaryActivated] = this.getActivatedStates();
+    var constantX = 0;
+    var constantY = 0;
+    var d = -1;
+    if(flipped){
+      constantX = size*7
+      constantY = size*9;
+      d = +1;
+    }
+    if(primaryActivated && secondaryActivated){
+      const unicode = this.model;
+      const color = this.color === WHITE? "rgb(255,255,255)": "rgb(0,0,0)";
+      ctx.beginPath();
+      ctx.fillStyle = color;
+      ctx.font = ((size*8/10)).toString() + "px serif";
+      ctx.fillText(unicode, constantX - d*x, constantY-d*(y)-size/10, ((size*9/10)*(7/10)));
+      ctx.fill();
+      ctx.closePath();
+      ctx.beginPath();
+      ctx.strokeStyle = "rgb(0,0,0)";
+      ctx.font = ((size*8/10)).toString() + "px serif";
+      ctx.strokeText(unicode, constantX - d*x, constantY - d*(y)-size/10, ((size*9/10)*(7/10)));
+      ctx.stroke();
+      ctx.closePath();
+      ctx.beginPath();
+      const unicode2 = this.secondary_model;
+      ctx.fillStyle = color;
+      ctx.font = ((size*8/10)).toString() + "px serif";
+      ctx.fillText(unicode2, constantX - d*x +((size*9/10)/2), constantY-d*(y)-size/10, ((size*9/10)*(7/10)));
+      ctx.fill();
+      ctx.closePath();
+      ctx.beginPath();
+      ctx.strokeStyle = "rgb(0,0,0)";
+      ctx.font = ((size*8/10)).toString() + "px serif";
+      ctx.strokeText(unicode2, constantX - d*x + +((size*9/10)/2), constantY - d*(y)-size/10, ((size*9/10)*(7/10)));
+      ctx.stroke();
+      ctx.closePath();
+    } else if(primaryActivated && !this.isTrueKing() && !secondaryActivated) {
+      const unicode = this.model;
+      const color = this.color === WHITE? "rgb(255,255,255)": "rgb(0,0,0)";
+      ctx.beginPath();
+      ctx.fillStyle = color;
+      ctx.font = ((size*9/10)).toString() + "px serif";
+      ctx.fillText(unicode, constantX - d*x, constantY-d*(y)-size/10, ((size*9/10)*(6/7)));
+      ctx.fill();
+      ctx.closePath();
+      ctx.beginPath();
+      ctx.strokeStyle = "rgb(0,0,0)";
+      ctx.font = ((size*9/10)).toString() + "px serif";
+      ctx.strokeText(unicode, constantX - d*x, constantY - d*(y)-size/10, ((size*9/10)*(6/7)));
+      ctx.stroke();
+      ctx.closePath();
+      ctx.beginPath();
+      const unicode2 = this.secondary_model;
+      ctx.fillStyle = color;
+      ctx.font = ((size*9/10)*(3/7)).toString() + "px serif";
+      ctx.fillText(unicode2, constantX - d*x +((size*9/10)*(4/7)), constantY-d*(y)-size/10, ((size*9/10)*(3/7)));
+      ctx.fill();
+      ctx.closePath();
+      ctx.beginPath();
+      ctx.strokeStyle = "rgb(0,0,0)";
+      ctx.font = ((size*9/10)*(3/7)).toString() + "px serif";
+      ctx.strokeText(unicode2, constantX - d*x + +((size*9/10)*(4/7)), constantY - d*(y)-size/10, ((size*9/10)*(3/7)));
+      ctx.stroke();
+      ctx.closePath();
+    }else if(!primaryActivated && !this.isTrueKing() && secondaryActivated){
+      const unicode = this.model;
+      const color = this.color === WHITE? "rgb(255,255,255)": "rgb(0,0,0)";
+      ctx.beginPath();
+      ctx.fillStyle = color;
+      ctx.font = ((size*9/10)*(3/7)).toString() + "px serif";
+      ctx.fillText(unicode, constantX - d*x +((size*9/10)*1/7), constantY-d*(y)-size/10, ((size*9/10)*(3/7)));
+      ctx.fill();
+      ctx.closePath();
+      ctx.beginPath();
+      ctx.strokeStyle = "rgb(0,0,0)";
+      ctx.font = ((size*9/10)*(3/7)).toString() + "px serif";
+      ctx.strokeText(unicode, constantX - d*x + ((size*9/10)*1/7), constantY - d*(y)-size/10, ((size*9/10)*(3/7)));
+      ctx.stroke();
+      ctx.closePath();
+      ctx.beginPath();
+      const unicode2 = this.secondary_model;
+      ctx.fillStyle = color;
+      ctx.font = ((size*9/10)).toString() + "px serif";
+      ctx.fillText(unicode2, constantX - d*x +((size*9/10)*(2/7)), constantY-d*(y)-size/10, ((size*9/10)*(6/7)));
+      ctx.fill();
+      ctx.closePath();
+      ctx.beginPath();
+      ctx.strokeStyle = "rgb(0,0,0)";
+      ctx.font = ((size*9/10)).toString() + "px serif";
+      ctx.strokeText(unicode2, constantX - d*x + +((size*9/10)*(2/7)), constantY - d*(y)-size/10, ((size*9/10)*(6/7)));
+      ctx.stroke();
+      ctx.closePath();
+    }else
+      {
+      const unicode = this.model;
+      const color = this.color === WHITE? "rgb(255,255,255)": "rgb(0,0,0)";
+      ctx.beginPath();
+      ctx.fillStyle = color;
+      ctx.font = (size*9/10).toString() + "px serif";
+      ctx.fillText(unicode, constantX - d*x, constantY-d*(y)-size/10);
+      ctx.fill();
+      ctx.closePath();
+      ctx.beginPath();
+      ctx.strokeStyle = "rgb(0,0,0)";
+      ctx.font = (size*9/10).toString() + "px serif";
+      ctx.strokeText(unicode, constantX - d*x, constantY - d*(y)-size/10);
+      ctx.stroke();
+      ctx.closePath();
+    }
+
+  }
+
+  getActivatedStates(){
+    var one = false;
+    var two = false;
+    if( this.states[this.stateSpace[0]]) one = true;
+    if( this.states[this.stateSpace[1]]) two = true;
+    return [one,two];
   }
 
   parseTooltip(){
@@ -160,7 +283,7 @@ function checkLeftRightKing(position, color, board, legal_moves){
   const r = 8*cur_row + position%8 + 1;
   if(cur_row === getRow(l) && inBoard(l)){
 
-    if(board.getID(l) === null) legal_moves.push(l);
+    if(board.getID(l) === 0) legal_moves.push(l);
     else{
       const piece_color = board.getColor(l);
       if(color !== piece_color) legal_moves.push(l);
@@ -168,7 +291,7 @@ function checkLeftRightKing(position, color, board, legal_moves){
   }
   if(cur_row === getRow(r) && inBoard(r)){
 
-    if(board.getID(r) === null) legal_moves.push(r);
+    if(board.getID(r) === 0) legal_moves.push(r);
     else{
       const piece_color = board.getColor(r);
       if(color !== piece_color) legal_moves.push(r);
@@ -183,17 +306,17 @@ function checkUpperRowKing(position, color, board, legal_moves){
   const m = u_row*8 + position%8;
   const r = u_row*8 + position%8 + 1;
   if(inBoardRow(getRow(l)) && u_row === getRow(l)){
-    if(board.getID(l) === null) legal_moves.push(l);
+    if(board.getID(l) === 0) legal_moves.push(l);
     else if(board.getColor(l) !== color){
       legal_moves.push(l);
     }
   }
-  if(board.getID(m) === null) legal_moves.push(m);
+  if(board.getID(m) === 0) legal_moves.push(m);
   else if(board.getColor(m) !== color){
     legal_moves.push(m);
   }
   if(inBoardRow(getRow(r)) && u_row === getRow(r)){
-    if(board.getID(r) === null) legal_moves.push(r);
+    if(board.getID(r) === 0) legal_moves.push(r);
     else if(board.getColor(r) !== color){
       legal_moves.push(r);
     }
@@ -208,7 +331,7 @@ function checkLowerRowKing(position, color, board, legal_moves){
   const m = l_row*8 + position%8;
   const r = l_row*8 + position%8 + 1;
   if(inBoardRow(getRow(l)) && l_row === getRow(l)){
-    if(board.getID(l) === null) legal_moves.push(l);
+    if(board.getID(l) === 0) legal_moves.push(l);
     else if(board.getColor(l) !== color){
       legal_moves.push(l);
     }
@@ -218,7 +341,7 @@ function checkLowerRowKing(position, color, board, legal_moves){
     legal_moves.push(m);
   }
   if(inBoardRow(getRow(r)) && l_row === getRow(r)){
-    if(board.getID(r) === null) legal_moves.push(r);
+    if(board.getID(r) === 0) legal_moves.push(r);
     else if(board.getColor(r) !== color){
       legal_moves.push(r);
     }
@@ -236,12 +359,12 @@ function checkCapture(position, dy, color, board, legal_moves){
   const l = capture_row * 8 + (position%8)- 1;
   const r = capture_row * 8 + (position%8)+ 1;
   if(capture_row === getRow(l) && inBoard(l)){
-    if(board.getID(l) !== null && board.getColor(l) !== color){
+    if(board.getID(l) !== 0 && board.getColor(l) !== color){
       legal_moves.push(l);
     }
   }
   if(capture_row === getRow(r) && inBoard(r)){
-    if(board.getID(r) !== null && board.getColor(r) !== color){
+    if(board.getID(r) !== 0 && board.getColor(r) !== color){
       legal_moves.push(r);
     }
   }
@@ -251,7 +374,7 @@ function checkForward(position, dy, color, board, legal_moves){
   for(let i = 0; i < Math.abs(dy); i++){
     const next_row = getRow(position) + (i+1)*Math.sign(dy);
     const next_pos = next_row*8 + position%8;
-    if(board.getID(next_pos) === null) legal_moves.push(next_pos);
+    if(board.getID(next_pos) === 0) legal_moves.push(next_pos);
     else{
       break;
     }
@@ -268,12 +391,12 @@ function checkUpperKnight(position, color, board, legal_moves){
     const l = upper_row*8 +position%8 - 1;
     const r = upper_row*8 +position%8 + 1;
     if(inBoard(l) && getRow(l) === upper_row){
-      if(board.getID(l) === null || board.getColor(l) !== color){
+      if(board.getID(l) === 0 || board.getColor(l) !== color){
         legal_moves.push(l);
       }
     }
     if(inBoard(r) && getRow(r) === upper_row){
-      if(board.getID(r) === null || board.getColor(r) !== color){
+      if(board.getID(r) === 0 || board.getColor(r) !== color){
         legal_moves.push(r);
       }
     }
@@ -287,12 +410,12 @@ function checkLowerKnight(position, color, board, legal_moves){
     const l = lower_row*8 +position%8 - 1;
     const r = lower_row*8 +position%8 + 1;
     if(inBoard(l) && getRow(l) === lower_row){
-      if(board.getID(l) === null || board.getColor(l) !== color){
+      if(board.getID(l) === 0 || board.getColor(l) !== color){
         legal_moves.push(l);
       }
     }
     if(inBoard(r) && getRow(r) === lower_row){
-      if(board.getID(r) === null || board.getColor(r) !== color){
+      if(board.getID(r) === 0 || board.getColor(r) !== color){
         legal_moves.push(r);
       }
     }
@@ -305,12 +428,12 @@ function checkLeftKnight(position, color, board, legal_moves){
   const u = u_row*8 +position%8 -2;
   const l = l_row*8 + position%8 -2;
   if(inBoardRow(u_row) && getRow(u) === u_row && inBoard(u)){
-    if(board.getID(u) === null || board.getColor(u) !== color){
+    if(board.getID(u) === 0 || board.getColor(u) !== color){
       legal_moves.push(u);
     }
   }
   if(inBoardRow(l_row) && getRow(l) === l_row && inBoard(l)){
-    if(board.getID(l) === null || board.getColor(l) !== color){
+    if(board.getID(l) === 0 || board.getColor(l) !== color){
       legal_moves.push(l);
     }
   }
@@ -323,12 +446,12 @@ function checkRightKnight(position, color, board, legal_moves){
   const u = u_row*8 +position%8 +2;
   const l = l_row*8 + position%8 +2;
   if(inBoardRow(u_row) && getRow(u) === u_row && inBoard(u)){
-    if(board.getID(u) === null || board.getColor(u) !== color){
+    if(board.getID(u) === 0 || board.getColor(u) !== color){
       legal_moves.push(u);
     }
   }
   if(inBoardRow(l_row) && getRow(l) === l_row && inBoard(l)){
-    if(board.getID(l) === null || board.getColor(l) !== color){
+    if(board.getID(l) === 0 || board.getColor(l) !== color){
       legal_moves.push(l);
     }
   }
@@ -374,7 +497,7 @@ function lowerRightDiagonal(position){
 function checkUpperLeftDiagonal(position, color, board, legal_moves){
   if(!inBoard(position)) return;
 
-  if(board.getID(position) === null) legal_moves.push(position);
+  if(board.getID(position) === 0) legal_moves.push(position);
   else{
     if(board.pieces[board.getID(position)].color === color) return; //friendly piece blocking
     else{ // capture enemy piece
@@ -388,7 +511,7 @@ function checkUpperLeftDiagonal(position, color, board, legal_moves){
 function checkUpperRightDiagonal(position, color, board, legal_moves){
   if(!inBoard(position)) return;
 
-  if(board.getID(position) === null) legal_moves.push(position);
+  if(board.getID(position) === 0) legal_moves.push(position);
   else{
     if(board.getColor(position) === color) return; //friendly piece blocking
     else{ // capture enemy piece
@@ -404,7 +527,7 @@ function checkUpperRightDiagonal(position, color, board, legal_moves){
 function checkLowerLeftDiagonal(position, color, board, legal_moves){
   if(!inBoard(position)) return;
 
-  if(board.getID(position) === null) legal_moves.push(position);
+  if(board.getID(position) === 0) legal_moves.push(position);
   else{
     if(board.getColor(position) === color) return; //friendly piece blocking
     else{ // capture enemy piece
@@ -420,7 +543,7 @@ function checkLowerLeftDiagonal(position, color, board, legal_moves){
 function checkLowerRightDiagonal(position, color, board, legal_moves){
   if(!inBoard(position)) return;
 
-  if(board.getID(position) === null) legal_moves.push(position);
+  if(board.getID(position) === 0) legal_moves.push(position);
   else{
     if(board.getColor(position) === color) return; //friendly piece blocking
     else{ // capture enemy piece
@@ -440,7 +563,7 @@ function CheckHorizontalLeft(position, row, color, board, legal_moves){
   const cur_row = getRow(position);
   if(cur_row !== row) return;
 
-  if(board.getID(position) === null) legal_moves.push(position);
+  if(board.getID(position) === 0) legal_moves.push(position);
   else{
     if(board.getColor(position) === color) return; // square is occupied
     else{ //square is a capture
@@ -456,7 +579,7 @@ function CheckHorizontalRight(position, row, color, board, legal_moves){
   const cur_row = getRow(position);
   if(cur_row !== row) return;
 
-  if(board.getID(position) === null) legal_moves.push(position);
+  if(board.getID(position) === 0) legal_moves.push(position);
   else{
     if(board.getColor(position) === color) return; // square is occupied
     else{ //square is a capture
@@ -473,7 +596,7 @@ function CheckHorizontalRight(position, row, color, board, legal_moves){
 function checkVerticalDown(position, color, board, legal_moves){
   if(!inBoard(position)) return;
 
-  if(board.getID(position) === null) legal_moves.push(position)
+  if(board.getID(position) === 0) legal_moves.push(position)
   else{
     if(board.getColor(position) === color) return;
     else{
@@ -488,7 +611,7 @@ function checkVerticalDown(position, color, board, legal_moves){
 function checkVerticalUp(position, color, board, legal_moves){
   if(!inBoard(position)) return;
 
-  if(board.getID(position) === null) legal_moves.push(position)
+  if(board.getID(position) === 0) legal_moves.push(position)
   else{
     if(board.getColor(position) === color) return;
     else{

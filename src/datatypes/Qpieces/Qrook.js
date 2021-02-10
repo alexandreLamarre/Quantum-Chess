@@ -8,11 +8,12 @@ const BLACK = 1;
 
 class Qrook extends Qpiece{
   constructor(color){
-    const s = new Set(["Rook", "Pawn"]);
+    const s = ["Rook", "Pawn"];
     // const model = new Image();
     // if(color === WHITE) model.src = QWROOK;
     const model = "\u{265C}";
-    super(s, Normal_state, "Measurement", color, model);
+    const secondary_model = "\u{265F}";
+    super(s, Normal_state, "Measurement", color, model, secondary_model);
   }
 }
 

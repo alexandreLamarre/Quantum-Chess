@@ -7,11 +7,12 @@ const BLACK = 1;
 
 class Qbishop extends Qpiece{
   constructor(color){
-    const s = new Set(["Bishop", "Pawn"]);
+    const s = ["Bishop", "Hadamard"];
     //const model = new Image();
     //if(color === WHITE) model.src = QWBISHOP;
     const model = "\u{265D}";
-    super(s, Normal_state, "PauliY", color, model);
+    const secondary_model = "\u{265F}";
+    super(s, Normal_state, "PauliY", color, model, secondary_model);
   }
 }
 

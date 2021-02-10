@@ -7,11 +7,12 @@ const BLACK = 1;
 
 class Qknight extends Qpiece{
   constructor(color){
-    const s = new Set(["Knight", "Pawn"], color);
+    const s = ["Knight", "Pawn"];
     // const model = new Image();
     // if(color === WHITE) model.src = QWKNIGHT;
     const model = "\u{265E}";
-    super(s, Normal_state, "PauliX", color, model);
+    const secondary_model = "\u{265F}";
+    super(s, Normal_state, "PauliX", color, model, secondary_model);
   }
 }
 

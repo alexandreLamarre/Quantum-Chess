@@ -56,7 +56,9 @@ class Main extends React.Component{
       chatHistory: [],
       highlight: true,
       highlight_check:true,
-      
+      mark: true,
+      drawArrow: true,
+
     }
     this.chess = React.createRef();
   }
