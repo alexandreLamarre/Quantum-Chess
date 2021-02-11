@@ -1,6 +1,9 @@
 const WHITE = 0;
 const BLACK = 1;
 
+const BISHOP_UNICODE = "\u{265D}";
+const QUEEN_UNICODE = "\u{265B}"
+
 /**
 Super class of all Quantum Pieces aka Q-pieces.
 **/
@@ -33,7 +36,7 @@ class Qpiece{
      }
      else{
        this.initialState = {};
-       var i = 0;
+       let i = 0;
        this.stateSpace.forEach(key => this.initialState[key] = initialState[i++])
        this.states = this.initialState;
      }
@@ -46,133 +49,145 @@ class Qpiece{
 
   drawPiece(ctx, size, x,y, flipped){
     const [primaryActivated, secondaryActivated] = this.getActivatedStates();
-    var constantX = 0;
-    var constantY = 0;
-    var d = -1;
+    let constantX = 0;
+    let constantY = 0;
+    let d = -1;
     if(flipped){
       constantX = size*7
       constantY = size*9;
       d = +1;
     }
     if(primaryActivated && secondaryActivated){
-      const unicode = this.model;
-      const color = this.color === WHITE? "rgb(255,255,255)": "rgb(0,0,0)";
-      ctx.beginPath();
-      ctx.fillStyle = color;
-      ctx.font = ((size*8/10)).toString() + "px serif";
-      ctx.fillText(unicode, constantX - d*x, constantY-d*(y)-size/10, ((size*9/10)*(7/10)));
-      ctx.fill();
-      ctx.closePath();
-      ctx.beginPath();
-      ctx.strokeStyle = "rgb(0,0,0)";
-      ctx.font = ((size*8/10)).toString() + "px serif";
-      ctx.strokeText(unicode, constantX - d*x, constantY - d*(y)-size/10, ((size*9/10)*(7/10)));
-      ctx.stroke();
-      ctx.closePath();
-      ctx.beginPath();
-      const unicode2 = this.secondary_model;
-      ctx.fillStyle = color;
-      ctx.font = ((size*8/10)).toString() + "px serif";
-      ctx.fillText(unicode2, constantX - d*x +((size*9/10)/2), constantY-d*(y)-size/10, ((size*9/10)*(7/10)));
-      ctx.fill();
-      ctx.closePath();
-      ctx.beginPath();
-      ctx.strokeStyle = "rgb(0,0,0)";
-      ctx.font = ((size*8/10)).toString() + "px serif";
-      ctx.strokeText(unicode2, constantX - d*x + +((size*9/10)/2), constantY - d*(y)-size/10, ((size*9/10)*(7/10)));
-      ctx.stroke();
-      ctx.closePath();
+      this.drawTwo(ctx, size, x, y, flipped, this.model, 8/9, -1/10,
+          this.secondary_model, 8/9, 3/7, constantX, constantY, d)
     } else if(primaryActivated && !this.isTrueKing() && !secondaryActivated) {
-      const unicode = this.model;
-      const color = this.color === WHITE? "rgb(255,255,255)": "rgb(0,0,0)";
-      ctx.beginPath();
-      ctx.fillStyle = color;
-      ctx.font = ((size*9/10)).toString() + "px serif";
-      ctx.fillText(unicode, constantX - d*x, constantY-d*(y)-size/10, ((size*9/10)*(6/7)));
-      ctx.fill();
-      ctx.closePath();
-      ctx.beginPath();
-      ctx.strokeStyle = "rgb(0,0,0)";
-      ctx.font = ((size*9/10)).toString() + "px serif";
-      ctx.strokeText(unicode, constantX - d*x, constantY - d*(y)-size/10, ((size*9/10)*(6/7)));
-      ctx.stroke();
-      ctx.closePath();
-      ctx.beginPath();
-      const unicode2 = this.secondary_model;
-      ctx.fillStyle = color;
-      ctx.font = ((size*9/10)*(3/7)).toString() + "px serif";
-      ctx.fillText(unicode2, constantX - d*x +((size*9/10)*(4/7)), constantY-d*(y)-size/10, ((size*9/10)*(3/7)));
-      ctx.fill();
-      ctx.closePath();
-      ctx.beginPath();
-      ctx.strokeStyle = "rgb(0,0,0)";
-      ctx.font = ((size*9/10)*(3/7)).toString() + "px serif";
-      ctx.strokeText(unicode2, constantX - d*x + +((size*9/10)*(4/7)), constantY - d*(y)-size/10, ((size*9/10)*(3/7)));
-      ctx.stroke();
-      ctx.closePath();
+      // draw2 scale1 6/7 offset1 0.0 scale2 3/7 offset2 4/7
+      this.drawTwo(ctx, size, x, y, flipped, this.model, 6/7, 0.0,
+          this.secondary_model, 3/7, 4/7, constantX, constantY, d);
     }else if(!primaryActivated && !this.isTrueKing() && secondaryActivated){
-      const unicode = this.model;
-      const color = this.color === WHITE? "rgb(255,255,255)": "rgb(0,0,0)";
-      ctx.beginPath();
-      ctx.fillStyle = color;
-      ctx.font = ((size*9/10)*(3/7)).toString() + "px serif";
-      ctx.fillText(unicode, constantX - d*x +((size*9/10)*1/7), constantY-d*(y)-size/10, ((size*9/10)*(3/7)));
-      ctx.fill();
-      ctx.closePath();
-      ctx.beginPath();
-      ctx.strokeStyle = "rgb(0,0,0)";
-      ctx.font = ((size*9/10)*(3/7)).toString() + "px serif";
-      ctx.strokeText(unicode, constantX - d*x + ((size*9/10)*1/7), constantY - d*(y)-size/10, ((size*9/10)*(3/7)));
-      ctx.stroke();
-      ctx.closePath();
-      ctx.beginPath();
-      const unicode2 = this.secondary_model;
-      ctx.fillStyle = color;
-      ctx.font = ((size*9/10)).toString() + "px serif";
-      ctx.fillText(unicode2, constantX - d*x +((size*9/10)*(2/7)), constantY-d*(y)-size/10, ((size*9/10)*(6/7)));
-      ctx.fill();
-      ctx.closePath();
-      ctx.beginPath();
-      ctx.strokeStyle = "rgb(0,0,0)";
-      ctx.font = ((size*9/10)).toString() + "px serif";
-      ctx.strokeText(unicode2, constantX - d*x + +((size*9/10)*(2/7)), constantY - d*(y)-size/10, ((size*9/10)*(6/7)));
-      ctx.stroke();
-      ctx.closePath();
+      //draw2  scale1 3/7 offset1 1/7 scale2 6/7 offset2 2/7
+      this.drawTwo(ctx, size, x, y, flipped, this.model, 3/7,
+          1/7, this.secondary_model, 6/7, 2/7,
+          constantX, constantY, d)
     }else
       {
-      const unicode = this.model;
-      const color = this.color === WHITE? "rgb(255,255,255)": "rgb(0,0,0)";
-      ctx.beginPath();
-      ctx.fillStyle = color;
-      ctx.font = (size*9/10).toString() + "px serif";
-      ctx.fillText(unicode, constantX - d*x, constantY-d*(y)-size/10);
-      ctx.fill();
-      ctx.closePath();
-      ctx.beginPath();
-      ctx.strokeStyle = "rgb(0,0,0)";
-      ctx.font = (size*9/10).toString() + "px serif";
-      ctx.strokeText(unicode, constantX - d*x, constantY - d*(y)-size/10);
-      ctx.stroke();
-      ctx.closePath();
+        this.draw(ctx, size, x, y, flipped, this.model);
     }
 
   }
 
+  draw(ctx, size, x, y, flipped, unicode){
+    let constantX = 0;
+    let constantY = 0;
+    let d = -1;
+    if(flipped){
+      constantX = size*7
+      constantY = size*9;
+      d = +1;
+    }
+    const color = this.color === WHITE? "rgb(255,255,255)": "rgb(0,0,0)";
+    ctx.beginPath();
+    ctx.fillStyle = color;
+    ctx.font = (size*9/10).toString() + "px serif";
+    ctx.fillText(unicode, constantX - d*x, constantY-d*(y)-size/10);
+    ctx.fill();
+    ctx.closePath();
+    ctx.beginPath();
+    ctx.strokeStyle = "rgb(0,0,0)";
+    ctx.font = (size*9/10).toString() + "px serif";
+    ctx.strokeText(unicode, constantX - d*x, constantY - d*(y)-size/10);
+    ctx.stroke();
+    ctx.closePath();
+  }
+
+  drawTwo(ctx, size, x, y, flipped, unicode, scale1, offset1, unicode2, scale2, offset2, constantX, constantY, d){
+    let offsetY = 0;
+    if(unicode === BISHOP_UNICODE) {
+      scale1 *= 7/9;
+      offsetY -= size*(1/15);
+      offset1 += 1/10;
+    }
+    if(unicode === QUEEN_UNICODE){
+
+      offset1+=1/30;
+      offsetY -= size*(1/50)
+    }
+    const color = this.color === WHITE? "rgb(255,255,255)": "rgb(0,0,0)";
+    ctx.beginPath();
+    ctx.fillStyle = color;
+    ctx.font = ((size*9/10)*(scale1)).toString() + "px serif";
+    ctx.fillText(unicode, constantX - d*x +((size*9/10)*offset1), constantY-d*(y)-size/10 + offsetY, ((size*9/10)*(scale1)));
+    ctx.fill();
+    ctx.closePath();
+    ctx.beginPath();
+    ctx.strokeStyle = "rgb(0,0,0)";
+    ctx.font = ((size*9/10)*(scale1)).toString() + "px serif";
+    ctx.strokeText(unicode, constantX - d*x + ((size*9/10)*offset1), constantY - d*(y)-size/10 + offsetY, ((size*9/10)*(scale1)));
+    ctx.stroke();
+    ctx.closePath();
+    ctx.beginPath();
+    // const unicode2 = this.secondary_model;
+    ctx.fillStyle = color;
+    ctx.font = ((size*9/10)*scale2).toString() + "px serif";
+    ctx.fillText(unicode2, constantX - d*x +((size*9/10)*(offset2)), constantY-d*(y)-size/10, ((size*9/10)*(scale2)));
+    ctx.fill();
+    ctx.closePath();
+    ctx.beginPath();
+    ctx.strokeStyle = "rgb(0,0,0)";
+    ctx.font = ((size*9/10)*scale2).toString() + "px serif";
+    ctx.strokeText(unicode2, constantX - d*x + +((size*9/10)*(offset2)), constantY - d*(y)-size/10, ((size*9/10)*(scale2)));
+    ctx.stroke();
+    ctx.closePath();
+  }
+
   getActivatedStates(){
-    var one = false;
-    var two = false;
-    if( this.states[this.stateSpace[0]]) one = true;
-    if( this.states[this.stateSpace[1]]) two = true;
+    let one = false;
+    let two = false;
+    if(this.stateSpace.length == 1) return [false,false]
+    if( this.notZero(this.states[this.stateSpace[0]])) one = true;
+    if( this.notZero(this.states[this.stateSpace[1]])) two = true;
     return [one,two];
   }
 
-  parseTooltip(){
-    return (
-    `
-    Initial state: ${this.initialState} \n
-    Quantum Circuit/action: ${this.action} \n
-    `)
+
+  /**
+   * Checks if a state in complex number form: [float, float]
+   * is non-zero
+   * **/
+  notZero(complex){
+    return complex[0] !== 0.0 || complex[1] !== 0.0;
+
   }
+
+  /**
+   * Returns the modulus of a complex number in the form: [float, float]
+   * @param complex: [float, float] the complex number whose modulus we want to find.
+   * **/
+  _modulus(complex){
+    return Math.sqrt(Math.pow(complex[0], 2) + Math.pow(complex[1], 2));
+  }
+
+  /**
+   * Gets probabilities of measuring states of this quantum piece.
+   * **/
+  getProbabilities(){
+    const probabilities = [];
+    if(this.stateSpace.length == 1){
+      return [{state: "King", model: this.model, probability: 100}]
+    }
+    for(let i = 0; i < this.stateSpace.length; i ++){
+      let model;
+      if(i === 0) model = this.model;
+      else if (i === 1) model = this.secondary_model;
+      probabilities.push({
+        state: this.stateSpace[i],
+        probability: (Math.pow(this._modulus(this.states[this.stateSpace[i]]),2)*100).toFixed(2),
+        model: model})
+    }
+    return probabilities;
+  }
+
+
 
   isTrueKing(){
     for(const state in this.states){
@@ -185,13 +200,14 @@ class Qpiece{
   @param id id of the piece that we select
   @param position the position on the board of the piece that we select
   @param board the quantum board everything takes place on
+  @param capture indicates whether or not the piece has moves that change if it can make a capture
   **/
   getLegalMoves(id,position, board, capture = false){
-    var states;
+    let states;
     const legal_moves = [];
     states = this.states;
     for(const state in states){
-      if(states[state] > 0){
+      if(this.notZero(states[state]) ){
         this._getLegalMoveHelper(state, position, board, legal_moves, capture);
       }
     }

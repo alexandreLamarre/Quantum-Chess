@@ -23,7 +23,7 @@ class Qpawn extends Qpiece{
     if(piece === "Rook") secondary_model = "\u{265C}";
       const model = "\u{265F}";
 
-    super(s, [1.0, 0.0], "PauliZ", color, model, secondary_model);
+    super(s, [[1.0,0.0], [0.0,0.0]], "PauliZ", color, model, secondary_model);
   }
 }
 

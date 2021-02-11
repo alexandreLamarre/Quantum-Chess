@@ -2,7 +2,8 @@ import React from "react";
 import "./ChessBoard.css";
 import QuantumBoard from  "../../datatypes/QuantumBoard";
 import {sendMsg} from "../../api";
-var FLIPPED = true;
+import Tooltip from "./Tooltip.js";
+
 
 const WHITE = 0;
 const BLACK = 1;
@@ -22,7 +23,7 @@ class ChessBoard extends React.Component{
       in_check_highlighted: [],
       toolTipx: 0,
       toolTipy: 0,
-      hoverPiece: false,
+      hoverPiece: null,
       selectedPiece: null,
       tooltip: "",
       dragging:false,
@@ -33,6 +34,8 @@ class ChessBoard extends React.Component{
       startArrow: null,
       currentArrow: null,
       arrows: new Set(),
+      visible: false,
+      hoverPieceId: 0,
     }
     this.canvas = React.createRef();
     this.main = this.props.main;
@@ -81,6 +84,8 @@ class ChessBoard extends React.Component{
 
   animate(){
     this.drawBoard(this.state.board, this.state.flipped);
+    if(this.state.hoverPiece) this.setState({visible: true})
+    else{ this.setState({visible: false})};
     requestAnimationFrame(() => this.animate())
   }
 
@@ -343,13 +348,19 @@ class ChessBoard extends React.Component{
   showToolTip(e){
     const square = this.getSquare(e)
     const id = this.state.board.getID(square);
-    if(id !== 0 && this.state.hoverPiece === false){
-      const piece = this.state.board.pieces[id].parseTooltip();
+    if(id !== 0 ){
+      const piece = this.state.board.pieces[id];
       const [x,y] = this.getMouseLocation(e);
-      this.setState({hoverPiece:true, toolTipx: x, toolTipy: y, tooltip: piece});
+      const size = this.canvas.current.width/8;
+      if(id !== this.state.hoverPieceId) {
+        const data = piece.getProbabilities();
+        this.setState({hoverPiece:data, hoverPieceId: id, toolTipx: x, toolTipy: y+size/2});
+      }
+
+      this.setState({ toolTipx: x, toolTipy: y+size/2});
     }
-    else{
-      this.setState({hoverPiece:false})
+    else if(id === 0){
+      this.setState({hoverPiece:null, hoverPieceId: 0})
     }
   }
 
@@ -401,7 +412,9 @@ class ChessBoard extends React.Component{
         userMarkedTiles: new Set(),
         arrows: new Set(),
         startArrow: null,
-        currentArrow: null});
+        currentArrow: null,
+        hoverPiece: null,
+        hoverId: 0});
       if(v && this.state.board.player === this.state.player){
         const [highlighted, id, x, y] = this.updateHighlighted(e)
         console.log(highlighted, id, x, y);
@@ -425,7 +438,7 @@ class ChessBoard extends React.Component{
     if(e.button === 2 && v){
       console.log("hello")
       const square = this.getSquare(e)
-      this.setState({startArrow: square})
+      this.setState({startArrow: square, hoverPiece: null, hoverId: 0});
     }
     else if(e.button === 2 && !v){
       if(this.state.arrow !== null){
@@ -447,10 +460,11 @@ class ChessBoard extends React.Component{
               && e.button === 0 && this.state.board.player === this.state.player){
       const [x,y] = this.getMouseLocation(e);
       this.setState({selectedX: x, selectedY: y})
-    }
-    if(this.state.startArrow !== null){
+    } else if(this.state.startArrow !== null){
       const square = this.getSquare(e)
       this.setState({currentArrow: square});
+    } else{
+      this.showToolTip(e)
     }
   }
 
@@ -467,17 +481,14 @@ class ChessBoard extends React.Component{
     // sendMsg()
   }
 
-  addToUserMarkedTiles(e){
-    e.preventDefault();
-    if(e.button === 2){
-      const square = this.getSquare(e);
-      console.log(this.state.userMarkedTiles)
-      this.setState({userMarkedTiles: [...this.state.userMarkedTiles, square]});
-    }
-  }
+
 
   render(){
     const moving = this.state.selectedPiece;
+    const component = this.state.hoverPiece !== null? this.state.hoverPiece.map((item,index) => {
+          return <Tooltip data = {item} key = {index} ></Tooltip>
+        }): <div></div>
+
     return (
       <div className = "boardArea">
         <canvas ref = {this.canvas} id = "chessBoard"
@@ -488,13 +499,12 @@ class ChessBoard extends React.Component{
         onMouseDown = {(e) => this.setDrag(e,true, false)}
         onMouseMove = {(e) => this.handleMouseEventsOnCanvas(e)}
         onMouseUp = {(e) => {this.setDrag(e,false)}}
-        onClick = {(e) => {this.addToUserMarkedTiles(e)}}
         className = "chessBoard"
         />
-        <div className = "tooltip" hidden = {!this.state.hoverPiece}
-        style = {{top: this.state.toolTipy, left: this.state.toolTipx}}
+        <div className = "tooltip" hidden = {!this.state.visible}
+        style = {{top: this.state.toolTipy, left: this.state.toolTipx, cursor: "default", pointerEvents: "none"}}
         >
-          {this.state.tooltip}
+          {component}
         </div>
       </div>
     )
