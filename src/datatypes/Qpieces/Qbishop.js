@@ -7,7 +7,7 @@ const BLACK = 1;
 
 class Qbishop extends Qpiece{
   constructor(color){
-    const s = ["Bishop", "Hadamard"];
+    const s = ["Bishop", "SqrtNOT"];
     //const model = new Image();
     //if(color === WHITE) model.src = QWBISHOP;
     const model = "\u{265D}";

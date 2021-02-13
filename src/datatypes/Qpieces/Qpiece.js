@@ -89,13 +89,13 @@ class Qpiece{
     ctx.beginPath();
     ctx.fillStyle = color;
     ctx.font = (size*9/10).toString() + "px serif";
-    ctx.fillText(unicode, constantX - d*x, constantY-d*(y)-size/10);
+    ctx.fillText(unicode, constantX - d*x + size/20, constantY-d*(y)-size/10);
     ctx.fill();
     ctx.closePath();
     ctx.beginPath();
     ctx.strokeStyle = "rgb(0,0,0)";
     ctx.font = (size*9/10).toString() + "px serif";
-    ctx.strokeText(unicode, constantX - d*x, constantY - d*(y)-size/10);
+    ctx.strokeText(unicode, constantX - d*x+size/20, constantY - d*(y)-size/10);
     ctx.stroke();
     ctx.closePath();
   }

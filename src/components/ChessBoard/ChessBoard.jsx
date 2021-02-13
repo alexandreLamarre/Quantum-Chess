@@ -431,11 +431,14 @@ class ChessBoard extends React.Component{
         this.setState({dragging: false, selectedPiece: null, highlighted: []})
       }
     }
-    if(e.button === 1 && !v){
+    if(e.button === 1 && !v && this.state.interacteable){
       const square = this.getSquare(e)
-      this.setState({userMarkedTiles: this.state.userMarkedTiles.add(square)})
+      const userMarkedTiles = this.state.userMarkedTiles;
+      if(!userMarkedTiles.has(square)){
+        this.setState({userMarkedTiles: userMarkedTiles.add(square)})
+      }
     }
-    if(e.button === 2 && v){
+    if(e.button === 2 && v ){
       console.log("hello")
       const square = this.getSquare(e)
       this.setState({startArrow: square, hoverPiece: null, hoverId: 0});
@@ -499,6 +502,7 @@ class ChessBoard extends React.Component{
         onMouseDown = {(e) => this.setDrag(e,true, false)}
         onMouseMove = {(e) => this.handleMouseEventsOnCanvas(e)}
         onMouseUp = {(e) => {this.setDrag(e,false)}}
+                onMouseLeave = {(e) => this.setState({hoverPiece: null, hoverId: 0})}
         className = "chessBoard"
         />
         <div className = "tooltip" hidden = {!this.state.visible}
