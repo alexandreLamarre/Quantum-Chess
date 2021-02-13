@@ -16,7 +16,7 @@ class ChessBoard extends React.Component{
   constructor(props){
     super(props);
     this.state = {
-      interacteable: true,
+      interacteable: false,
       size: 0,
       board: [],
       highlighted: [],
@@ -352,7 +352,7 @@ class ChessBoard extends React.Component{
       const piece = this.state.board.pieces[id];
       const [x,y] = this.getMouseLocation(e);
       const size = this.canvas.current.width/8;
-      if(id !== this.state.hoverPieceId) {
+      if(id !== this.state.hoverPieceId && piece !== undefined) {
         const data = piece.getProbabilities();
         this.setState({hoverPiece:data, hoverPieceId: id, toolTipx: x, toolTipy: y+size/2});
       }
@@ -438,12 +438,12 @@ class ChessBoard extends React.Component{
         this.setState({userMarkedTiles: userMarkedTiles.add(square)})
       }
     }
-    if(e.button === 2 && v ){
+    if(e.button === 2 && v &&this.state.interacteable ){
       console.log("hello")
       const square = this.getSquare(e)
       this.setState({startArrow: square, hoverPiece: null, hoverId: 0});
     }
-    else if(e.button === 2 && !v){
+    else if(e.button === 2 && !v && this.state.interacteable){
       if(this.state.arrow !== null){
         console.log("goodbye")
         const square = this.getSquare(e);
@@ -474,14 +474,14 @@ class ChessBoard extends React.Component{
   sendMove(start, end, legal_moves){
     if(start === end) return;
     if(!legal_moves.includes(end)) return;
-    // if(!this.main.state.gameSocket) {
-    //   console.log("Not connected to a game socket");
-    //   return;
-    // }
+    if(!this.main.state.gameSocket) {
+      console.log("Not connected to a game socket");
+      return;
+    }
     console.log("move", start, end);
     console.log(this.state.board.toJSON());
-    // this.setState({awaitingResponse:true})
-    // sendMsg()
+    this.setState({awaitingResponse:true})
+    sendMsg(this.main.state.gameSocket, this.state.board.toJSON(1, start, end))
   }
 
 

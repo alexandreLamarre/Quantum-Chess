@@ -11,7 +11,7 @@ class Qking extends Qpiece{
     // if(color === WHITE) model.src = QWKING;
     const model = "\u{265A}";
     const secondary_model = null;
-    super(s, [1.0], "None", color, model, secondary_model);
+    super(s, [[1.0, 0.0]], "None", color, model, secondary_model);
   }
 }
 

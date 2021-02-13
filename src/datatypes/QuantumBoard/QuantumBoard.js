@@ -36,14 +36,25 @@ class QuantumBoard {
     return new QuantumBoard(false, false, true, this.board.slice(), this.pieces, this.entanglements);
   }
 
-  toJSON(){
+    /**
+     *
+     * @param type of json message to send, 1:board update, X: board request
+     * @param start start of move
+     * @param end end of move
+    **/
+  toJSON(type, start, end){
     const board = this.board;
     const pieces = {};
     for(const key in this.pieces){
       pieces[key] = this.pieces[key].toJSON()
     }
     const entanglements = this.entanglements;
-    return {board: board, pieces: pieces, entanglements: entanglements}
+    if (start !== undefined && end !== undefined){
+        return {board: board, pieces: pieces, entanglements: entanglements, type: type, move:[start, end]}
+    } else{
+        return {board: board, pieces: pieces, entanglements: entanglements, type: type}
+    }
+
   }
 
   nextPlayer(){

@@ -50,7 +50,7 @@ class Main extends React.Component{
       ranked_queue: "- -",
       public_queue: "- - ",
       gameSocket: null,
-      other_player: null,
+      playing: null,
       other_player_name: null,
       other_player_icon: null,
       chatHistory: [],
@@ -103,7 +103,7 @@ class Main extends React.Component{
     console.log("parsed game data", data);
     if(parseInt(data.type) === 0){ //player connected and match starts
         console.log("Opponent connected", data.pid)
-        this.setState({other_player: true,
+        this.setState({playing: true,
           other_player_name: "Guest - " + data.pid, other_player_icon: personCircleOutline})
         this.chess.current.ResetBoard();
         this.chess.current.setState({interacteable: true,
@@ -112,7 +112,7 @@ class Main extends React.Component{
 
 
       } else if(parseInt(data.type) === 1){ //board update
-
+          console.log(data)
       //1. update board
       //parseBoardData
 
@@ -171,7 +171,7 @@ class Main extends React.Component{
             <IonCol size = "6">
 
             {/*Opponent */}
-            <div hidden = {this.state.other_player === null}>
+            <div hidden = {this.state.playing === null}>
             <User  name = {this.state.other_player_name}
             icon = {this.state.other_player_icon} />
             </div>
