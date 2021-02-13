@@ -89,9 +89,29 @@ class QuantumBoard {
 
   /**
   Update the board using JSON response
-  @param rsp JSON
+  @param rsp JSON data (supposedly of type 1)
   **/
   update(rsp){
+      if(rsp.type !== 1){
+          console.log("Critical board update failure")
+          return;
+      }
+      const newBoard = rsp.newBoard
+      const newPieces = rsp.newPieces
+      const newEntanglements = rsp.newEntanglements
+
+      console.log(newBoard, newPieces, newEntanglements)
+      this.board = newBoard
+      for(const id in newPieces.List){
+          this.pieces[parseInt(id)].states = newPieces.List[parseInt(id)].State
+      }
+
+      for(const id in newEntanglements.List){
+          this.entanglements[parseInt(id)] = newEntanglements.List[parseInt(id)]
+      }
+
+    console.log(this.board, this.pieces, this.entanglements)
+
 
   };
 

@@ -100,7 +100,6 @@ class Main extends React.Component{
 
   handleGameResponse(rsp){
     const data = JSON.parse(rsp.data);
-    console.log("parsed game data", data);
     if(parseInt(data.type) === 0){ //player connected and match starts
         console.log("Opponent connected", data.pid)
         this.setState({playing: true,
@@ -115,9 +114,12 @@ class Main extends React.Component{
           console.log(data)
       //1. update board
       //parseBoardData
+      this.chess.current.updateBoard(data)
 
       //this.chess.current.updateBoard(BoardData)
-      //2. update move log
+
+      //TODO: 2. update move log
+
       //send string representation of move to move log
 
     } else if (parseInt(data.type) === 2){ // chat update

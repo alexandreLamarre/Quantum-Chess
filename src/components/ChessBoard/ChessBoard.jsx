@@ -154,8 +154,8 @@ class ChessBoard extends React.Component{
   updateBoard(rsp){
     console.log("updating board...");
     const cur_player = this.state.board.player;
-    //parseJSONdata
-    this.state.board.update();
+
+    this.state.board.update(rsp);
     //use JSON data fields as necessary to update states of the board
 
 
@@ -479,8 +479,8 @@ class ChessBoard extends React.Component{
       return;
     }
     console.log("move", start, end);
-    console.log(this.state.board.toJSON());
     this.setState({awaitingResponse:true})
+    console.log("sending", this.state.board.toJSON(1))
     sendMsg(this.main.state.gameSocket, this.state.board.toJSON(1, start, end))
   }
 
