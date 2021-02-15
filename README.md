@@ -26,10 +26,10 @@ For those unfamiliar with Quantum mechanics, a brief overview is given in Quantu
 |Q-piece| State Space | Initial State | Quantum gate/action | Gate/action description | Symbol |
 | :---: | :---------: | :-----------: | :-----------------: | :-----------------------------: | :---: |
 | Q-pawn |\{Pawn, The piece starting behind it\}| 1.0 Pawn 0.0 Other piece | **Pauli Z**| Quantum phase shift: Essentially does nothing to affect the measurement probability outcomes | a |
-| Q-queen | \{Queen, Pawn\} | 1/sqrt(2) Queen 1/sqrt(2) Pawn | **Hadamard gate** | "Normalizes" quantum states, in particular takes determined states to evenly probable quantum states | a|
+| Q-queen | \{Queen, Pawn\} | 1/sqrt(2) Queen 1/sqrt(2) Pawn | **CNOT + Hadamard** | The control bit in the CNOT is the color of the piece, so that Q-queens only exert their quantum action of pieces of the same color. The Hadamard action "Normalizes" quantum states, in particular takes determined states to evenly probable quantum states | a|
 | Q-king | \{King\} | 1.0 King | None, just a regular chess king | None | a|
 | Q-rook | \{Rook, Pawn\} | 1/sqrt(2) Rook /sqrt(2) Pawn | **Measurement**| Performs the measurement action on a quantum system | a |
-| Q-bishop | \{Bishop, Pawn\} | 1/sqrt(2) Bishop 1/sqrt(2) Pawn | **Hadamard** |  "Normalizes" quantum states, in particular takes determined states to evenly probable quantum states |  a|
+| Q-bishop | \{Bishop, Pawn\} | 1/sqrt(2) Bishop 1/sqrt(2) Pawn | ** SqrtNOT ** | The SqrtNOT performs the NOT operation after two applications: SqrtNOT^2 = NOT |  a|
 | Q- knight | \{Kinght, pawn} | 1/sqrt(2) Kinght 1/sqrt(2) Pawn | **Pauli X** | controlled NOT gate, "swaps" the probability of quantum states|a |
 
 
@@ -42,18 +42,24 @@ For those unfamiliar with Quantum mechanics, a brief overview is given in Quantu
 
  #### Rules pertaining to Quantum entanglement & action of Q-pieces
 
- - **Rule 2.1** Once a piece has moved it exerts an **area of influence** if it is in a **mixed state**. The area of influence corresponds to the squares where the piece could move. Should any q-pieces be found in that area of influence they will become entagled with the moved piece. The moved piece then applies its quantum gate/ action.
+- **Rule 2.1** A quantum piece exerts its quantum action/circuit on other pieces if and only if it is in a mixed state. (It still exerts its quantum action on itself even if it is determined: A Q-queen is "sel- normalizing" in that respect.)
 
-  TODO: ADD EXAMPLE PICTURES
+ - **Rule 2.1** A quantum piece exerts its quantum action/circuit on the tile it has moved to if it is not performing a capture, and exerts its quantum action/circuit on all tiles it could legally reach from its new position. These tiles are called the piece's **'Area of Influence**. A quantum piece will performs its quantum action/circuit on all pieces within its **Area of Influence**, including itself:
+ 
+   - It will perform its action on all determined state pieces within its area of influence. 
+   
+   - Before performing its action on mixed state pieces it will entangle it with the current piece's system, as long as the mixed state piece would not enter a determined state.
+   
+   - If the moved piece started in an entangled system, it will apply its action to the new entangled system., with the added mixed state pieces from its area of influence.
+   
+   - Otherwise, if there are no new mixed state pieces to be added to the entangled system, it will perform its action on its entangled system. Its entangled system can also be itself. In this respect, a mixed state piece exerts its action on itself if its area of influence contains no mixed state pieces and it was not entangled to any other pieces. 
 
-- **Rule 2.2** Here is the flowchart for turn chronology:
+
+- **Rule 2.2** Here is the flowchart for moving a quantum piece:
 
     - TODO ADD FLOW CHART
 
-- **Rule 2.3** The area of influence, entaglement and quantum circuit/action only apply on the turn the piece is moved.
-  - E.g. if a Q-piece moves within a Q-queen's diagonal on a subsequent turn, it does not become entagled with the Q-queen due to Q-queen's area of influence. It only becomes entangled with the Q-queen if Q-queen is within the moved piece's own area of influence.
-
-- **Rule 2.4** A Q-queen cannot become entangled with an opponent's pieces, nor does it exert its quantum circuit/action upon them.
+- **Rule 2.3** The area of influence, entaglement and quantum circuit/action only apply on the turn the piece is moved. 
 
 #### Rules pertaining to quantum measurement of Q-pieces
 
@@ -70,10 +76,10 @@ Chronologically, this event happens after a capture if it occured, so the piece 
 
 #### Rules pertaining to winning
 
-**There is no checkmate in Quantum Chess**, since there are too many probabilistic ways to end up in check and checkmate.
+**There is no checkmate in Quantum Chess**, since there are too many probabilistic ways to end up in check or checkmate. A player could also put himself non-deterministically into check before the end of his turn.
 
-- **Rule 5.1** Instead winning and losing is determined after pieces have moved, circuits evaluated, measured, etc..., but before the next player's turn. If one of the player's
-**determined state King** (A Q-piece that has current state King: 1.0) is in check when his or turn is about to end they lose the game.
+- **Rule 5.1** Instead, winning and losing is determined after pieces have moved, circuits evaluated, measured, etc..., but before the next player's turn. If **one** (of two possible) of the player's
+**determined state King** (A Q-piece that has current state King: 1.0) is in check when his or turn is about to end, they lose the game.
 
 - **Rule 5.2** Alternatively, the game can also end when a player has only one remaining determined state king that is flipped back to a mixed state. The player whose remaining determined state king was flipped to a mixed state loses, while the other wins.
 
